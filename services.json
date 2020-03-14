@@ -1,0 +1,7 @@
+{
+  "Microblading": {"index": 0, "title":  "Microblading"},
+  "Brow lamination" : {"index": 1, "title":  "Brow lamination" },
+  "Lash lift + tint": {"index": 2, "title":  "Lash lift + tint"},
+  "Lash extensions": {"index": 3, "title":  "Lash extensions"},
+  "Facial": {"index": 4, "title": "Facial"}
+}
