@@ -1,7 +1,7 @@
-{
-  "Microblading": {"index": 0, "title":  "Microblading"},
-  "Brow lamination" : {"index": 1, "title":  "Brow lamination" },
-  "Lash lift + tint": {"index": 2, "title":  "Lash lift + tint"},
-  "Lash extensions": {"index": 3, "title":  "Lash extensions"},
-  "Facial": {"index": 4, "title": "Facial"}
-}
+[
+  {"index": 0, "selected": false, "title":  "Microblading"},
+  {"index": 1, "selected": false, "title":  "Brow lamination" },
+  {"index": 2, "selected": false, "title":  "Lash lift + tint"},
+  {"index": 3, "selected": false, "title":  "Lash extensions"},
+  {"index": 4, "selected": false, "title": "Facial"}
+]

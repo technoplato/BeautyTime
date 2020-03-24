@@ -4,30 +4,17 @@ import * as React from "react";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import { Provider as PaperProvider, Title } from "react-native-paper";
-import HeartButton from "./src/HeartButton";
-import ServiceListItemComponent from "./src/ServiceListItemComponent";
 
 import servicesJSON from "../BeautyTime/services.json";
+import ServiceListItemComponent from "./src/ServiceListItemComponent";
 import { Service } from "./src/Types";
+import ApplicationStyles from "./src/Themes/ApplicationStyles";
 
 const ServiceSelectionScreen = props => {
-  const [services, setServices] = useState<Service[]>(
-    Object.values<Service>(servicesJSON).map(s => ({
-      title: s.title,
-      selected: false,
-      index: s.index
-    }))
-  );
-
-  console.log("App::22: services :", JSON.stringify(services, null, 4));
+  const [services, setServices] = useState<Service[]>(servicesJSON);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        paddingTop: 32
-      }}
-    >
+    <View style={ApplicationStyles.screen.mainContainer}>
       <Title style={{ alignSelf: "center", paddingBottom: 24 }}>
         Select services being performed:
       </Title>
