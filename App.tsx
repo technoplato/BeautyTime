@@ -1,9 +1,10 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
-import { Provider as PaperProvider, Title } from "react-native-paper";
+import { Headline, Provider as PaperProvider, Title } from "react-native-paper";
+import * as Font from "expo-font";
 
 import servicesJSON from "../BeautyTime/services.json";
 import ServiceListItemComponent from "./src/ServiceListItemComponent";
@@ -15,9 +16,9 @@ const ServiceSelectionScreen = props => {
 
   return (
     <View style={ApplicationStyles.screen.mainContainer}>
-      <Title style={{ alignSelf: "center", paddingBottom: 24 }}>
+      <Headline style={{ alignSelf: "center", paddingBottom: 24 }}>
         Select services being performed:
-      </Title>
+      </Headline>
       {services.map(service => {
         return (
           <ServiceListItemComponent
@@ -47,10 +48,22 @@ function DetailsScreen() {
 
 const Stack = createStackNavigator();
 
-function App() {
+const App = () => {
+  const [loading, setLoading] = useState<boolean>(true);
+  useEffect(() => {
+    if (!loading) return;
+    Font.loadAsync({
+      "champagne-limousines": require("./assets/fonts/ChampagneLimousines.ttf"),
+      "champagne-limousines-bold": require("./assets/fonts/ChampagneLimousinesBold.ttf"),
+      "champagne-limousines-italic": require("./assets/fonts/ChampagneLimousinesItalic.ttf")
+    }).then(() => setLoading(false));
+  }, [loading]);
+
+  if (loading) return null;
+
   return (
     <NavigationContainer>
-      <PaperProvider>
+      <PaperProvider theme={ApplicationStyles.theme}>
         <Stack.Navigator screenOptions={{ title: "Beauty & the Brow" }}>
           <Stack.Screen name="Services" component={ServiceSelectionScreen} />
           <Stack.Screen name="Details" component={DetailsScreen} />
@@ -58,6 +71,6 @@ function App() {
       </PaperProvider>
     </NavigationContainer>
   );
-}
+};
 
 export default App;

@@ -1,7 +1,9 @@
-import { default as React, useState } from "react";
-import { Text, TouchableWithoutFeedback, View } from "react-native";
+import { default as React } from "react";
+import { TouchableWithoutFeedback, View } from "react-native";
 import HeartButton from "./HeartButton";
 import { Service } from "./Types";
+import { Headline, Text, Title } from "react-native-paper";
+import Fonts from "../src/Themes/Fonts";
 
 interface Props {
   onToggle: (nowSelected: boolean) => void;
@@ -19,7 +21,7 @@ const ServiceListItemComponent = ({ onToggle, selected, service }: Props) => {
         }}
       >
         <HeartButton onToggle={() => onToggle(!selected)} selected={selected} />
-        <Text>{service.title}</Text>
+        <Title>{service.title}</Title>
       </View>
     </TouchableWithoutFeedback>
   );
