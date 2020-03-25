@@ -1,73 +1,124 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as React from "react";
-import { useEffect, useState } from "react";
-import { Text, View } from "react-native";
-import { Headline, Provider as PaperProvider, Title } from "react-native-paper";
-import * as Font from "expo-font";
+import { View, Image, Dimensions } from "react-native";
+import {
+  Button,
+  Text,
+  Headline,
+  Provider as PaperProvider
+} from "react-native-paper";
 
-import servicesJSON from "../BeautyTime/services.json";
-import ServiceListItemComponent from "./src/ServiceListItemComponent";
-import { Service } from "./src/Types";
-import ApplicationStyles from "./src/Themes/ApplicationStyles";
+import BeautyServiceList from "beauty-services/BeautyServiceList";
+import { BeautyServiceProvider } from "beauty-services/BeautyServicesContext";
+import ApplicationStyles from "themes/ApplicationStyles";
+import useCustomFonts from "fonts/useCustomFonts";
+import * as metrics from "themes/Metrics";
 
-const ServiceSelectionScreen = props => {
-  const [services, setServices] = useState<Service[]>(servicesJSON);
-
+const ServiceSelectionScreen = ({ navigation }) => {
   return (
     <View style={ApplicationStyles.screen.mainContainer}>
       <Headline style={{ alignSelf: "center", paddingBottom: 24 }}>
         Select services being performed:
       </Headline>
-      {services.map(service => {
-        return (
-          <ServiceListItemComponent
-            key={service.title}
-            onToggle={selected => {
-              setServices(old => {
-                const tmp = [...old];
-                tmp[service.index] = { ...service, selected };
-                return tmp;
-              });
-            }}
-            selected={service.selected}
-            service={service}
-          />
-        );
-      })}
+      <BeautyServiceList />
+      <Button
+        style={{ paddingBottom: 32 }}
+        color="black"
+        mode="text"
+        onPress={() => navigation.navigate("Details")}
+      >
+        Choose Options for Services
+      </Button>
     </View>
   );
 };
-function DetailsScreen() {
+
+const DetailsScreen = () => {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text>Details Screen</Text>
     </View>
   );
-}
+};
 
 const Stack = createStackNavigator();
 
 const App = () => {
-  const [loading, setLoading] = useState<boolean>(true);
-  useEffect(() => {
-    if (!loading) return;
-    Font.loadAsync({
-      "champagne-limousines": require("./assets/fonts/ChampagneLimousines.ttf"),
-      "champagne-limousines-bold": require("./assets/fonts/ChampagneLimousinesBold.ttf"),
-      "champagne-limousines-italic": require("./assets/fonts/ChampagneLimousinesItalic.ttf")
-    }).then(() => setLoading(false));
-  }, [loading]);
+  const { loading } = useCustomFonts();
+
+  const { width } = Dimensions.get("window");
+  const padding = 42;
 
   if (loading) return null;
 
   return (
     <NavigationContainer>
       <PaperProvider theme={ApplicationStyles.theme}>
-        <Stack.Navigator screenOptions={{ title: "Beauty & the Brow" }}>
-          <Stack.Screen name="Services" component={ServiceSelectionScreen} />
-          <Stack.Screen name="Details" component={DetailsScreen} />
-        </Stack.Navigator>
+        <BeautyServiceProvider>
+          <Stack.Navigator
+            screenOptions={({ navigation, route }) => {
+              return {
+                header: () => (
+                  <View
+                    style={{
+                      height: 120,
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Image
+                      style={{
+                        width: width - 2 * padding,
+                        marginTop: 30
+                      }}
+                      source={require("../BeautyTime/assets/bb_logo.png")}
+                      resizeMode="contain"
+                    />
+                  </View>
+                )
+
+                // headerTitle: () => <Headline>Beauty & the Brow Icon</Headline>,
+                // headerTitle: () => (
+                //   <View
+                //     style={{
+                //       padding,
+                //       marginTop: 12,
+                //       width,
+                //       justifyContent: "center",
+                //       flexDirection: "row"
+                //     }}
+                //   >
+                //     <Image
+                //       style={{
+                //         width: width - 2 * padding
+                //       }}
+                //       source={require("../BeautyTime/assets/bb_logo.png")}
+                //       resizeMode="contain"
+                //     />
+                //   </View>
+                // ),
+                // headerLeft: () => {
+                //   if (
+                //     !["services", "timers"].includes(route.name.toLowerCase())
+                //   ) {
+                //     return (
+                //       <Text
+                //         style={{ paddingLeft: 16 }}
+                //         onPress={() => navigation.goBack()}
+                //       >
+                //         back
+                //       </Text>
+                //     );
+                //   }
+                // }
+              };
+            }}
+          >
+            <Stack.Screen name="Services" component={ServiceSelectionScreen} />
+            <Stack.Screen name="Details" component={DetailsScreen} />
+          </Stack.Navigator>
+        </BeautyServiceProvider>
       </PaperProvider>
     </NavigationContainer>
   );

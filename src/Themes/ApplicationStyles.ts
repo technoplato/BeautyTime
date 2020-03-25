@@ -1,7 +1,5 @@
-import Fonts from "./Fonts";
-import Metrics from "./Metrics";
-import Colors from "./Colors";
 import { DefaultTheme } from "react-native-paper";
+import Colors from "./Colors";
 
 const theme = {
   ...DefaultTheme,
