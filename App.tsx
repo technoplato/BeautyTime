@@ -40,7 +40,7 @@ const ServiceSelectionScreen = ({ navigation }) => {
   return (
     <View style={ApplicationStyles.screen.serviceSelection}>
       <Headline style={{ alignSelf: "center", paddingBottom: 24 }}>
-        Select services being performed:
+        Select services being performed:aaa
       </Headline>
       <BeautyServiceList />
       <Button
@@ -113,24 +113,6 @@ const OptionsScreen = ({ route, navigation }) => {
   );
 };
 
-const DATA = [
-  {
-    title: "Main dishes",
-    data: ["Pizza", "Burger", "Risotto"]
-  },
-  {
-    title: "Sides",
-    data: ["French Fries", "Onion Rings", "Fried Shrimps"]
-  },
-  {
-    title: "Drinks",
-    data: ["Water", "Coke", "Beer"]
-  },
-  {
-    title: "Desserts",
-    data: ["Cheese Cake", "Ice Cream"]
-  }
-];
 const styles = StyleSheet.create({
   container: {
     flex: 1,

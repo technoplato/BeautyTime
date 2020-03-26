@@ -14,6 +14,7 @@ const BeautyServiceListItem = ({ onToggle, service }: Props) => {
     <TouchableWithoutFeedback onPress={() => onToggle(!service.selected)}>
       <View
         style={{
+          width: 230,
           flexDirection: "row",
           alignItems: "center"
         }}

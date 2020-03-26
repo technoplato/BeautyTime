@@ -15,6 +15,7 @@ const BeautyServiceListItem = ({ onToggle, option }: Props) => {
       <View
         style={{
           width: "100%",
+          paddingHorizontal: 60,
           flexDirection: "row",
           alignItems: "center"
         }}
