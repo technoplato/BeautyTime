@@ -13,10 +13,17 @@ const theme = {
 
 const ApplicationStyles = {
   screen: {
-    mainContainer: {
+    serviceSelection: {
       flex: 1,
-      backgroundColor: Colors.background,
-      paddingTop: 32
+      backgroundColor: Colors.background
+    },
+    options: {
+      flex: 1,
+      backgroundColor: Colors.background
+    },
+    timers: {
+      flex: 1,
+      backgroundColor: Colors.background
     }
   },
   theme

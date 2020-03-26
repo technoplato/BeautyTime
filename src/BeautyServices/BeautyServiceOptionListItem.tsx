@@ -2,30 +2,31 @@ import { default as React } from "react";
 import { TouchableWithoutFeedback, View } from "react-native";
 import { Title } from "react-native-paper";
 import HeartButton from "../HeartButton";
-import { BeautyService } from "../Types";
+import { BeautyService, BeautyServiceOption } from "../Types";
 
 interface Props {
   onToggle: (nowSelected: boolean) => void;
-  service: BeautyService;
+  option: BeautyServiceOption;
 }
 
-const BeautyServiceListItemComponent = ({ onToggle, service }: Props) => {
+const BeautyServiceListItem = ({ onToggle, option }: Props) => {
   return (
-    <TouchableWithoutFeedback onPress={() => onToggle(!service.selected)}>
+    <TouchableWithoutFeedback onPress={() => onToggle(!option.selected)}>
       <View
         style={{
+          width: "100%",
           flexDirection: "row",
           alignItems: "center"
         }}
       >
         <HeartButton
-          onToggle={() => onToggle(!service.selected)}
-          selected={service.selected}
+          onToggle={() => onToggle(!option.selected)}
+          selected={option.selected}
         />
-        <Title>{service.title}</Title>
+        <Title>{option.title}</Title>
       </View>
     </TouchableWithoutFeedback>
   );
 };
 
-export default BeautyServiceListItemComponent;
+export default BeautyServiceListItem;

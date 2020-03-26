@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import BeautyServiceListItemComponent from "./BeautyServiceListItemComponent";
+import BeautyServiceListItem from "./BeautyServiceListItem";
 import useBeautyServices from "./BeautyServicesContext";
 import { BeautyService } from "../Types";
 
@@ -10,7 +10,7 @@ const BeautyServiceList = () => {
     <View style={styles.container}>
       {allServices.map((service: BeautyService) => {
         return (
-          <BeautyServiceListItemComponent
+          <BeautyServiceListItem
             key={service.title}
             onToggle={selected => selectService(service, selected)}
             service={service}
