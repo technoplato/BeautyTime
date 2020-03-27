@@ -3,23 +3,36 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import BeautyServiceList from "beauty-services/BeautyServiceList";
 import useCustomFonts from "fonts/useCustomFonts";
-import { useState } from "react";
+import * as Animatable from "react-native-animatable";
+
 import * as React from "react";
-import { Dimensions, Image, SectionList, View, StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  Image,
+  SectionList,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from "react-native";
 import {
   Button,
+  Card,
   Headline,
   Provider as PaperProvider,
   Text
 } from "react-native-paper";
-
 import ApplicationStyles from "themes/ApplicationStyles";
 import { useTimer } from "use-timer";
 import BeautyServiceOptionList from "./src/BeautyServices/BeautyServiceOptionList";
 import useBeautyServices, {
   BeautyServiceProvider
 } from "./src/BeautyServices/BeautyServicesContext";
-import { BeautyService, REPEAT_UNTIL_DONE_SIGNIFIER } from "./src/Types";
+import {
+  BeautyService,
+  REPEAT_UNTIL_DONE_SIGNIFIER,
+  Timing
+} from "./src/Types";
+import formatDuration from "./src/Utilities/formatDuration";
 
 const serviceSelectionButtonText = (
   first: BeautyService,
@@ -40,7 +53,7 @@ const ServiceSelectionScreen = ({ navigation }) => {
   return (
     <View style={ApplicationStyles.screen.serviceSelection}>
       <Headline style={{ alignSelf: "center", paddingBottom: 24 }}>
-        Select services being performed:aaa
+        Select services being performed
       </Headline>
       <BeautyServiceList />
       <Button
@@ -120,8 +133,8 @@ const styles = StyleSheet.create({
     marginHorizontal: 16
   },
   item: {
-    padding: 20,
-    marginVertical: 8
+    padding: 12,
+    flexDirection: "row"
   },
   header: {
     fontSize: 32,
@@ -133,60 +146,108 @@ const styles = StyleSheet.create({
     fontSize: 24
   }
 });
+type TimerListItemSegmentProps = {
+  sequential: Timing[];
+  left?: boolean;
+  right?: boolean;
+};
+
+const endTime = 0;
+
+const TimerListItemSegment = ({
+  sequential,
+  left,
+  right
+}: TimerListItemSegmentProps) => {
+  const [step, setStep] = useState<number>(0);
+  const [serviceCompleted, setServiceCompleted] = useState<boolean>(false);
+  const count = sequential.length;
+  const currentOption = sequential[step];
+  const { time, start, reset, isRunning } = useTimer({
+    timerType: "DECREMENTAL",
+    endTime,
+    initialTime: Math.floor(currentOption.seconds / 100)
+  });
+
+  console.log("App::172: time:", time);
+  const stepComplete = time === endTime;
+
+  const [flashing, flashBackground] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (stepComplete && !serviceCompleted) {
+      flashBackground(!flashing);
+    } else {
+      flashBackground(false);
+    }
+  }, [stepComplete, serviceCompleted]);
+
+  const onPress = () => {
+    if (serviceCompleted || isRunning) {
+      return;
+    } else if (!isRunning && !stepComplete) {
+      start();
+    } else if (step === count - 1) {
+      setServiceCompleted(true);
+    } else if (sequential[step + 1].title === REPEAT_UNTIL_DONE_SIGNIFIER) {
+      reset();
+    } else if (stepComplete) {
+      reset();
+      setStep(step + 1);
+    }
+  };
+
+  return (
+    <Card
+      style={{
+        flex: 1,
+        marginHorizontal: 4
+      }}
+      onPress={onPress}
+    >
+      {!serviceCompleted ? (
+        <Animatable.View
+          transition="borderWidth"
+          iterationCount={"infinite"}
+          direction={"alternate"}
+          onTransitionEnd={() => {
+            if (stepComplete) {
+              flashBackground(!flashing);
+            }
+          }}
+          style={{
+            padding: 8,
+            alignItems: right ? "flex-end" : "flex-start",
+            backgroundColor: flashing ? "red" : "white"
+          }}
+        >
+          {left && <Text>LEFT</Text>}
+          {right && <Text style={{ textAlign: "right" }}>RIGHT</Text>}
+          <Text style={{ textAlign: right ? "right" : "left" }}>
+            {currentOption.title}
+          </Text>
+          <Text>Remaining: {formatDuration(time)}</Text>
+        </Animatable.View>
+      ) : (
+        <Text>Service Completed! ✅</Text>
+      )}
+    </Card>
+  );
+};
 
 const TimerListItem = ({ option }) => {
-  const [step, setStep] = useState<number>(0);
-  const count = option.sequential.length;
-  const currentOption = option.sequential[step];
-  const { time, start, pause, reset, isRunning } = useTimer({
-    timerType: "DECREMENTAL",
-    initialTime: currentOption?.seconds
-  });
   return (
     <View style={styles.item}>
-      <Text style={styles.title}>
-        {option?.title} ({count} steps)
-      </Text>
-      <Text style={styles.title}>
-        Left and right? {option.leftRight ? "Yes" : "No"}
-      </Text>
-      <Text
-        onPress={() => {
-          console.log(
-            "App::168: {step, count, currentOption} :",
-            JSON.stringify({ step, count, currentOption }, null, 4)
-          );
-          if (step === -1) {
-            return;
-          }
-          if (
-            step === count - 1 &&
-            currentOption.title !== REPEAT_UNTIL_DONE_SIGNIFIER
-          ) {
-            setStep(-1);
-          } else if (currentOption.title === REPEAT_UNTIL_DONE_SIGNIFIER) {
-            console.log(
-              `App::181: done incrementing, just repeat until finished`
-            );
-            console.log(`App::182: to repeat:`);
-            console.log(
-              "App::183: option.sequential[step - 1] :",
-              JSON.stringify(option.sequential[step - 1], null, 4)
-            );
-          } else {
-            setStep((step + 1) % count);
-          }
-        }}
-        style={styles.title}
-      >
-        step {step}
-        {JSON.stringify(option.sequential[step], null, 4)}
-      </Text>
-      <Button onPress={start}>start</Button>
-      <Button onPress={pause}>pause</Button>
-      <Button onPress={reset}>reset</Button>
-      <Text>Elapsed time: {time}</Text>
-      {isRunning && <Text>Running...</Text>}
+      {option.leftRight && (
+        <>
+          <TimerListItemSegment left sequential={option.sequential} />
+          <TimerListItemSegment right sequential={option.sequential} />
+        </>
+      )}
+
+      {!option.leftRight && (
+        <TimerListItemSegment sequential={option.sequential} />
+      )}
     </View>
   );
 };
@@ -200,6 +261,7 @@ const TimersScreen = ({ route, navigation }) => {
     }));
 
     return {
+      title: service.title,
       data: service.options
         .filter(o => o.selected)
         .map(o => ({ ...o, leftRight: service.leftRight }))
@@ -211,15 +273,54 @@ const TimersScreen = ({ route, navigation }) => {
   return (
     <View style={ApplicationStyles.screen.timers}>
       <SectionList
+        renderSectionFooter={thing => {
+          if (!thing) {
+            return null;
+          } else {
+            // Ew
+            const showCompleteServiceButton = thing.section.data
+              .map(o =>
+                o?.sequential.map(timing => timing.title === "*").includes(true)
+              )
+              .includes(true);
+            if (!showCompleteServiceButton) {
+              return null;
+            }
+            return (
+              <View style={{ padding: 14 }}>
+                <Button
+                  disabled={selectedServices.length === 0}
+                  color="white"
+                  mode="contained"
+                  onPress={() => {
+                    alert(
+                      "TODO - MARK COMPLETE - " + thing.section.service.title
+                    );
+                  }}
+                >
+                  Mark Service Complete
+                </Button>
+              </View>
+            );
+          }
+        }}
+        refreshControl={null}
         showsVerticalScrollIndicator={false}
         sections={sections}
-        keyExtractor={(item, index) => index + ""}
-        renderItem={({ item }) => {
-          if (!item) return null;
+        refreshing={true}
+        keyExtractor={(item, index) => {
+          return index + "";
+        }}
+        renderItem={thing => {
+          const item = thing.item;
+          if (!item) {
+            return null;
+          }
+
           return <TimerListItem option={item} />;
         }}
         renderSectionHeader={({ section }) => {
-          return <Text style={styles.header}>{section.service.title}</Text>;
+          return <Text style={styles.header}>{section.title}</Text>;
         }}
       />
     </View>
@@ -245,7 +346,6 @@ const App = () => {
                     style={{
                       height: 120,
                       justifyContent: "center",
-                      backgroundColor: "white",
                       alignItems: "center",
                       flexDirection: "row",
                       marginTop: 30,
@@ -255,6 +355,7 @@ const App = () => {
                     <Image
                       style={{
                         flex: 1,
+                        height: 120,
                         margin: 24
                       }}
                       source={require("../BeautyTime/assets/bb_logo.png")}

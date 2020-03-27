@@ -77,6 +77,7 @@ const ALL_SERVICES: BeautyService[] = [
       }
     ]
   },
+
   {
     index: 2,
     selected: false,
@@ -126,7 +127,7 @@ const ALL_SERVICES: BeautyService[] = [
     index: 3,
     selected: false,
     title: "Lash extensions",
-    leftRight: true,
+    leftRight: false,
     singleOption: true,
     defaultOptions: [
       {
@@ -159,30 +160,6 @@ const ALL_SERVICES: BeautyService[] = [
         title: "Complete Session",
         selected: false,
         sequential: [{ title: "Complete Session", seconds: 3600 }]
-      }
-    ],
-    defaultOptions: [
-      {
-        title: "",
-        selected: true,
-        sequential: [
-          {
-            title: "Ink Soak",
-            seconds: 600
-          },
-          {
-            title: "Numbing Gel",
-            seconds: 600
-          },
-          {
-            title: "Ink Soak",
-            seconds: 600
-          },
-          {
-            title: REPEAT_UNTIL_DONE_SIGNIFIER,
-            seconds: 600
-          }
-        ]
       }
     ],
     singleOption: false
