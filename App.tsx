@@ -6,12 +6,13 @@ import useCustomFonts from "fonts/useCustomFonts";
 import * as Animatable from "react-native-animatable";
 
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Image,
   SectionList,
   StyleSheet,
   TouchableOpacity,
+  Text,
   View
 } from "react-native";
 import {
@@ -19,7 +20,7 @@ import {
   Card,
   Headline,
   Provider as PaperProvider,
-  Text
+  Title
 } from "react-native-paper";
 import ApplicationStyles from "themes/ApplicationStyles";
 import { useTimer } from "use-timer";
@@ -29,6 +30,7 @@ import useBeautyServices, {
 } from "./src/BeautyServices/BeautyServicesContext";
 import {
   BeautyService,
+  BeautyServiceOption,
   REPEAT_UNTIL_DONE_SIGNIFIER,
   Timing
 } from "./src/Types";
@@ -71,7 +73,23 @@ const ServiceSelectionScreen = ({ navigation }) => {
           }
         }}
       >
-        {serviceSelectionButtonText(firstServiceToConfigure, selectedServices)}
+        <Text
+          style={{
+            flex: 1,
+            width: 200,
+            fontFamily: "champagne-limousines-bold",
+            color: "white"
+          }}
+          numberOfLines={1}
+          ellipsizeMode="middle"
+          adjustsFontSizeToFit={true}
+          minimumFontScale={0.01}
+        >
+          {serviceSelectionButtonText(
+            firstServiceToConfigure,
+            selectedServices
+          )}
+        </Text>
       </Button>
     </View>
   );
@@ -104,24 +122,41 @@ const OptionsScreen = ({ route, navigation }) => {
   return (
     <View style={ApplicationStyles.screen.options}>
       <BeautyServiceOptionList service={findServiceByName(route.params.name)} />
-
-      <Button
-        contentStyle={{ marginVertical: 32 }}
-        color="black"
-        mode="contained"
-        disabled={service.options.filter(o => o.selected).length === 0}
-        onPress={() => {
-          if (nextService) {
-            navigation.navigate("Options", {
-              name: nextService.title
-            });
-          } else {
-            navigation.navigate("Timers");
-          }
+      <TouchableOpacity
+        style={{
+          alignItems: "center",
+          backgroundColor: "#000000aa",
+          padding: 10
         }}
+        // onPress={() => {
+        //   if (nextService) {
+        //     navigation.navigate("Options", {
+        //       name: nextService.title
+        //     });
+        //   } else {
+        //     navigation.navigate("Timers");
+        //   }
+        // }}
+        // disabled={service.options.filter(o => o.selected).length === 0}
+        // GET TEXT SCALING WORKING AND YOU'RE DONE FOR NOW
+        onPress={() => {}}
       >
-        {optionsSelectionButtonText(service, nextService)}
-      </Button>
+        <Text
+          numberOfLines={1}
+          minimumFontScale={0.01}
+          adjustsFontSizeToFit={true}
+          style={{
+            fontSize: 24,
+            textTransform: "uppercase",
+            padding: 22,
+            paddingBottom: 80,
+            fontFamily: "champagne-limousines-bold",
+            color: "white"
+          }}
+        >
+          {optionsSelectionButtonText(service, nextService)}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -147,56 +182,68 @@ const styles = StyleSheet.create({
   }
 });
 type TimerListItemSegmentProps = {
+  service: BeautyService;
   sequential: Timing[];
   left?: boolean;
   right?: boolean;
+  onOptionComplete: () => void;
 };
 
 const endTime = 0;
 
 const TimerListItemSegment = ({
+  service,
   sequential,
   left,
-  right
+  right,
+  onOptionComplete
 }: TimerListItemSegmentProps) => {
   const [step, setStep] = useState<number>(0);
-  const [serviceCompleted, setServiceCompleted] = useState<boolean>(false);
+  const [repeats, setRepeats] = useState<number>(0);
+
+  const [optionCompleted, setOptionsCompleted] = useState<boolean>(false);
   const count = sequential.length;
   const currentOption = sequential[step];
   const { time, start, reset, isRunning } = useTimer({
     timerType: "DECREMENTAL",
     endTime,
-    initialTime: Math.floor(currentOption.seconds / 100)
+    // initialTime: Math.floor(currentOption.seconds / 100)
+    initialTime: 1
   });
 
-  console.log("App::172: time:", time);
   const stepComplete = time === endTime;
 
   const [flashing, flashBackground] = useState<boolean>(false);
 
   useEffect(() => {
-    if (stepComplete && !serviceCompleted) {
+    if (optionCompleted) {
+      onOptionComplete();
+    }
+  }, [optionCompleted]);
+
+  useEffect(() => {
+    if (stepComplete && !optionCompleted) {
       flashBackground(!flashing);
     } else {
       flashBackground(false);
     }
-  }, [stepComplete, serviceCompleted]);
+  }, [stepComplete, optionCompleted]);
 
   const onPress = () => {
-    if (serviceCompleted || isRunning) {
+    if (optionCompleted || isRunning) {
       return;
     } else if (!isRunning && !stepComplete) {
       start();
     } else if (step === count - 1) {
-      setServiceCompleted(true);
+      setOptionsCompleted(true);
     } else if (sequential[step + 1].title === REPEAT_UNTIL_DONE_SIGNIFIER) {
+      setRepeats(repeats + 1);
       reset();
     } else if (stepComplete) {
       reset();
       setStep(step + 1);
     }
   };
-
   return (
     <Card
       style={{
@@ -205,7 +252,7 @@ const TimerListItemSegment = ({
       }}
       onPress={onPress}
     >
-      {!serviceCompleted ? (
+      {!optionCompleted && !service.completed ? (
         <Animatable.View
           transition="borderWidth"
           iterationCount={"infinite"}
@@ -224,79 +271,129 @@ const TimerListItemSegment = ({
           {left && <Text>LEFT</Text>}
           {right && <Text style={{ textAlign: "right" }}>RIGHT</Text>}
           <Text style={{ textAlign: right ? "right" : "left" }}>
-            {currentOption.title}
+            {currentOption.title} {repeats !== 0 && `(${step + 1 + repeats})`}
           </Text>
           <Text>Remaining: {formatDuration(time)}</Text>
         </Animatable.View>
       ) : (
-        <Text>Service Completed! ✅</Text>
+        <Text>Option Completed! ✅</Text>
       )}
     </Card>
   );
 };
 
-const TimerListItem = ({ option }) => {
-  return (
-    <View style={styles.item}>
-      {option.leftRight && (
-        <>
-          <TimerListItemSegment left sequential={option.sequential} />
-          <TimerListItemSegment right sequential={option.sequential} />
-        </>
-      )}
+const TimerListItem = ({ option, service }) => {
+  const { markOptionComplete } = useBeautyServices();
 
-      {!option.leftRight && (
-        <TimerListItemSegment sequential={option.sequential} />
-      )}
-    </View>
-  );
+  const handleOptionComplete = (
+    option: BeautyServiceOption,
+    specifier: string
+  ) => {
+    markOptionComplete(service.title, option.title, specifier);
+  };
+
+  return useMemo(() => {
+    return (
+      <View style={styles.item}>
+        {option.leftRight && (
+          <>
+            <TimerListItemSegment
+              service={service}
+              onOptionComplete={() => handleOptionComplete(option, "left")}
+              left
+              sequential={option.sequential}
+            />
+            <TimerListItemSegment
+              service={service}
+              onOptionComplete={() => handleOptionComplete(option, "right")}
+              right
+              sequential={option.sequential}
+            />
+          </>
+        )}
+
+        {!option.leftRight && (
+          <TimerListItemSegment
+            service={service}
+            onOptionComplete={() => {
+              handleOptionComplete(option, "both");
+            }}
+            sequential={option.sequential}
+          />
+        )}
+      </View>
+    );
+  }, [service, option]);
 };
 
-const TimersScreen = ({ route, navigation }) => {
-  const { selectedServices } = useBeautyServices();
+const TimersScreen = ({ navigation }) => {
+  const {
+    selectedServices,
+    markOptionComplete,
+    sessionComplete
+  } = useBeautyServices();
+
+  const { time, start, pause, isRunning } = useTimer();
+
+  useEffect(() => {
+    if (!isRunning && !sessionComplete) {
+      start();
+    } else if (sessionComplete) {
+      pause();
+    }
+  }, [isRunning, sessionComplete]);
+
+  useEffect(() => {
+    if (sessionComplete) {
+      navigation.navigate("SessionComplete");
+    }
+  }, [sessionComplete]);
+
   const sections = selectedServices.map(service => {
-    const defaultOptions = service.defaultOptions?.map(opt => ({
-      ...opt,
-      leftRight: service.leftRight
-    }));
+    const data = service.options
+      .filter(o => o.selected || o.isDefault)
+      .map(o => ({
+        ...o,
+        leftRight: service.leftRight
+      }));
 
     return {
       title: service.title,
-      data: service.options
-        .filter(o => o.selected)
-        .map(o => ({ ...o, leftRight: service.leftRight }))
-        .concat(defaultOptions),
+      data,
       service
     };
   });
 
-  return (
-    <View style={ApplicationStyles.screen.timers}>
+  const completedCount = selectedServices
+    .filter(s => s.completed)
+    .reduce(count => {
+      return count + 1;
+    }, 0);
+
+  const list = useMemo(() => {
+    return (
       <SectionList
         renderSectionFooter={thing => {
           if (!thing) {
             return null;
           } else {
             // Ew
-            const showCompleteServiceButton = thing.section.data
-              .map(o =>
-                o?.sequential.map(timing => timing.title === "*").includes(true)
-              )
-              .includes(true);
+            const service: BeautyService = thing.section.service;
+            const showCompleteServiceButton =
+              service.allowForce && !service.completed;
             if (!showCompleteServiceButton) {
               return null;
             }
+
             return (
               <View style={{ padding: 14 }}>
                 <Button
                   disabled={selectedServices.length === 0}
                   color="white"
                   mode="contained"
-                  onPress={() => {
-                    alert(
-                      "TODO - MARK COMPLETE - " + thing.section.service.title
-                    );
-                  }}
+                  onPress={() =>
+                    markOptionComplete(thing.section.title, null, "force")
+                  }
                 >
                   Mark Service Complete
                 </Button>
@@ -304,25 +401,48 @@ const TimersScreen = ({ route, navigation }) => {
             );
           }
         }}
-        refreshControl={null}
         showsVerticalScrollIndicator={false}
         sections={sections}
-        refreshing={true}
         keyExtractor={(item, index) => {
           return index + "";
         }}
-        renderItem={thing => {
-          const item = thing.item;
-          if (!item) {
-            return null;
-          }
+        renderItem={sectionContainer => {
+          const item = sectionContainer.item;
 
-          return <TimerListItem option={item} />;
+          return (
+            <TimerListItem
+              option={item}
+              service={sectionContainer.section.service}
+            />
+          );
         }}
         renderSectionHeader={({ section }) => {
           return <Text style={styles.header}>{section.title}</Text>;
         }}
       />
+    );
+  }, [sections.length, completedCount]);
+
+  return (
+    <View style={ApplicationStyles.screen.timers}>
+      <View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "white"
+        }}
+      >
+        <Headline>Session Length: {formatDuration(time)}</Headline>
+      </View>
+      {list}
+    </View>
+  );
+};
+
+const SessionCompleteScreen = ({ navigation }) => {
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text>DONE WITH SERVICES HOORAY</Text>
     </View>
   );
 };
@@ -369,6 +489,10 @@ const App = () => {
             <Stack.Screen name="Services" component={ServiceSelectionScreen} />
             <Stack.Screen name="Options" component={OptionsScreen} />
             <Stack.Screen name="Timers" component={TimersScreen} />
+            <Stack.Screen
+              name="SessionComplete"
+              component={SessionCompleteScreen}
+            />
           </Stack.Navigator>
         </BeautyServiceProvider>
       </PaperProvider>

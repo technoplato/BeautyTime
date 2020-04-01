@@ -3,14 +3,17 @@ import { BeautyService, REPEAT_UNTIL_DONE_SIGNIFIER } from "./src/Types";
 const ALL_SERVICES: BeautyService[] = [
   {
     index: 0,
+    completed: false,
     selected: false,
     title: "Microblading",
     singleOption: true,
     leftRight: false,
-    defaultOptions: [
+    allowForce: true,
+    options: [
       {
-        title: "",
+        title: "Microblading Ink and Numbing Gel",
         selected: true,
+        isDefault: true,
         sequential: [
           {
             title: "Ink Soak",
@@ -34,6 +37,7 @@ const ALL_SERVICES: BeautyService[] = [
   },
   {
     index: 1,
+    completed: false,
     selected: false,
     title: "Brow lamination",
     singleOption: true,
@@ -80,6 +84,7 @@ const ALL_SERVICES: BeautyService[] = [
 
   {
     index: 2,
+    completed: false,
     selected: false,
     title: "Lash lift + tint",
     singleOption: true,
@@ -125,14 +130,17 @@ const ALL_SERVICES: BeautyService[] = [
   },
   {
     index: 3,
+    completed: false,
     selected: false,
     title: "Lash extensions",
     leftRight: false,
     singleOption: true,
-    defaultOptions: [
+    allowForce: true,
+    options: [
       {
-        title: "",
+        title: "Lash extensions - Replace Glue",
         selected: true,
+        isDefault: true,
         sequential: [
           { title: "Replace Glue", seconds: 1200 },
           { title: REPEAT_UNTIL_DONE_SIGNIFIER, seconds: 0 }
@@ -142,6 +150,7 @@ const ALL_SERVICES: BeautyService[] = [
   },
   {
     index: 4,
+    completed: false,
     selected: false,
     leftRight: false,
     title: "Facial",

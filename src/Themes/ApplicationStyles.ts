@@ -4,10 +4,10 @@ import Colors from "./Colors";
 const theme = {
   ...DefaultTheme,
   fonts: {
-    regular: { fontSize: 24, fontFamily: "champagne-limousines" },
-    medium: { fontSize: 24, fontFamily: "champagne-limousines-bold" },
-    light: { fontSize: 24, fontFamily: "champagne-limousines-italic" },
-    thin: { fontSize: 24, fontFamily: "champagne-limousines-italic" }
+    regular: { fontSize: 20, fontFamily: "champagne-limousines" },
+    medium: { fontSize: 20, fontFamily: "champagne-limousines-bold" },
+    light: { fontSize: 20, fontFamily: "champagne-limousines-italic" },
+    thin: { fontSize: 20, fontFamily: "champagne-limousines-italic" }
   }
 };
 
