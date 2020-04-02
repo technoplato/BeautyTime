@@ -30,6 +30,7 @@ type BeautyServicesContextProps =
         specifier: string
       ) => void;
       sessionComplete: boolean;
+      reset: () => void;
     }
   | undefined;
 
@@ -144,6 +145,8 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
     }
   };
 
+  const reset = () => setAllServices(servicesJSON);
+
   return {
     selectService,
     allServices,
@@ -153,7 +156,8 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
     findServiceByName,
     firstServiceToConfigure,
     markOptionComplete,
-    sessionComplete
+    sessionComplete,
+    reset
   };
 };
 

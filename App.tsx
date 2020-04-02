@@ -3,7 +3,6 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import BeautyServiceList from "beauty-services/BeautyServiceList";
 import useCustomFonts from "fonts/useCustomFonts";
-import * as Animatable from "react-native-animatable";
 
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -11,16 +10,16 @@ import {
   Image,
   SectionList,
   StyleSheet,
-  TouchableOpacity,
   Text,
+  TouchableOpacity,
   View
 } from "react-native";
+import * as Animatable from "react-native-animatable";
 import {
   Button,
   Card,
   Headline,
-  Provider as PaperProvider,
-  Title
+  Provider as PaperProvider
 } from "react-native-paper";
 import ApplicationStyles from "themes/ApplicationStyles";
 import { useTimer } from "use-timer";
@@ -58,11 +57,12 @@ const ServiceSelectionScreen = ({ navigation }) => {
         Select services being performed
       </Headline>
       <BeautyServiceList />
-      <Button
-        contentStyle={{ marginVertical: 32 }}
-        disabled={selectedServices.length === 0}
-        color="black"
-        mode="contained"
+
+      <DynamicFontSizeBlackButtonFooter
+        title={serviceSelectionButtonText(
+          firstServiceToConfigure,
+          selectedServices
+        )}
         onPress={() => {
           if (firstServiceToConfigure) {
             navigation.navigate("Options", {
@@ -72,25 +72,8 @@ const ServiceSelectionScreen = ({ navigation }) => {
             navigation.navigate("Timers");
           }
         }}
-      >
-        <Text
-          style={{
-            flex: 1,
-            width: 200,
-            fontFamily: "champagne-limousines-bold",
-            color: "white"
-          }}
-          numberOfLines={1}
-          ellipsizeMode="middle"
-          adjustsFontSizeToFit={true}
-          minimumFontScale={0.01}
-        >
-          {serviceSelectionButtonText(
-            firstServiceToConfigure,
-            selectedServices
-          )}
-        </Text>
-      </Button>
+        disabled={selectedServices.length === 0}
+      />
     </View>
   );
 };
@@ -122,41 +105,19 @@ const OptionsScreen = ({ route, navigation }) => {
   return (
     <View style={ApplicationStyles.screen.options}>
       <BeautyServiceOptionList service={findServiceByName(route.params.name)} />
-      <TouchableOpacity
-        style={{
-          alignItems: "center",
-          backgroundColor: "#000000aa",
-          padding: 10
+      <DynamicFontSizeBlackButtonFooter
+        title={optionsSelectionButtonText(service, nextService)}
+        onPress={() => {
+          if (nextService) {
+            navigation.navigate("Options", {
+              name: nextService.title
+            });
+          } else {
+            navigation.navigate("Timers");
+          }
         }}
-        // onPress={() => {
-        //   if (nextService) {
-        //     navigation.navigate("Options", {
-        //       name: nextService.title
-        //     });
-        //   } else {
-        //     navigation.navigate("Timers");
-        //   }
-        // }}
-        // disabled={service.options.filter(o => o.selected).length === 0}
-        // GET TEXT SCALING WORKING AND YOU'RE DONE FOR NOW
-        onPress={() => {}}
-      >
-        <Text
-          numberOfLines={1}
-          minimumFontScale={0.01}
-          adjustsFontSizeToFit={true}
-          style={{
-            fontSize: 24,
-            textTransform: "uppercase",
-            padding: 22,
-            paddingBottom: 80,
-            fontFamily: "champagne-limousines-bold",
-            color: "white"
-          }}
-        >
-          {optionsSelectionButtonText(service, nextService)}
-        </Text>
-      </TouchableOpacity>
+        disabled={service.options.filter(o => o.selected).length === 0}
+      />
     </View>
   );
 };
@@ -207,8 +168,7 @@ const TimerListItemSegment = ({
   const { time, start, reset, isRunning } = useTimer({
     timerType: "DECREMENTAL",
     endTime,
-    // initialTime: Math.floor(currentOption.seconds / 100)
-    initialTime: 1
+    initialTime: currentOption.seconds
   });
 
   const stepComplete = time === endTime;
@@ -276,7 +236,7 @@ const TimerListItemSegment = ({
           <Text>Remaining: {formatDuration(time)}</Text>
         </Animatable.View>
       ) : (
-        <Text>Option Completed! ✅</Text>
+        <Text style={{ padding: 8 }}>Option Completed! ✅</Text>
       )}
     </Card>
   );
@@ -330,7 +290,8 @@ const TimersScreen = ({ navigation }) => {
   const {
     selectedServices,
     markOptionComplete,
-    sessionComplete
+    sessionComplete,
+    reset
   } = useBeautyServices();
 
   const { time, start, pause, isRunning } = useTimer();
@@ -345,6 +306,7 @@ const TimersScreen = ({ navigation }) => {
 
   useEffect(() => {
     if (sessionComplete) {
+      reset();
       navigation.navigate("SessionComplete");
     }
   }, [sessionComplete]);
@@ -432,7 +394,7 @@ const TimersScreen = ({ navigation }) => {
           backgroundColor: "white"
         }}
       >
-        <Headline>Session Length: {formatDuration(time)}</Headline>
+        <Headline>Session Length: {formatDuration(time, true)}</Headline>
       </View>
       {list}
     </View>
@@ -443,11 +405,56 @@ const SessionCompleteScreen = ({ navigation }) => {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
       <Text>DONE WITH SERVICES HOORAY</Text>
+
+      <Button
+        color="black"
+        mode="contained"
+        onPress={() => navigation.popToTop()}
+      >
+        Start Another Session
+      </Button>
     </View>
   );
 };
 
 const Stack = createStackNavigator();
+
+const DynamicFontSizeBlackButtonFooter = ({ title, onPress, disabled }) => {
+  const buttonStyles = [
+    {
+      alignItems: "center",
+      marginTop: 50,
+      backgroundColor: "#000000",
+      padding: 10
+    }
+  ];
+  const textStyles = [
+    {
+      fontSize: 24,
+      textTransform: "uppercase",
+      padding: 22,
+      paddingBottom: 80,
+      fontFamily: "champagne-limousines-bold",
+      color: "white"
+    }
+  ];
+  if (disabled) {
+    buttonStyles.push({ backgroundColor: "#e0e0e0" });
+    textStyles.push({ color: "#00000052" });
+  }
+  return (
+    <TouchableOpacity
+      disabled={disabled}
+      activeOpacity={0.9}
+      style={buttonStyles}
+      onPress={onPress}
+    >
+      <Text numberOfLines={1} adjustsFontSizeToFit={true} style={textStyles}>
+        {title}
+      </Text>
+    </TouchableOpacity>
+  );
+};
 
 const App = () => {
   const { loading } = useCustomFonts();
