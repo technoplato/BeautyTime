@@ -4,10 +4,10 @@ import React, {
   Provider,
   useContext,
   useEffect,
-  useState
+  useState,
 } from "react";
-import servicesJSON from "../../BEAUTY_SERVICES";
-import { BeautyService, BeautyServiceOption } from "../Types";
+import servicesJSON from "../../../BEAUTY_SERVICES";
+import { BeautyService, BeautyServiceOption } from "../../Types";
 
 type BeautyServicesContextProps =
   | {
@@ -43,14 +43,14 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
   const [firstServiceToConfigure, setFirstServiceToConfigure] = useState<
     BeautyService
   >(null);
-  const selectedServices = allServices.filter(service => service.selected);
+  const selectedServices = allServices.filter((service) => service.selected);
 
   const sessionComplete: boolean =
-    selectedServices.length > 0 && selectedServices.every(s => s.completed);
+    selectedServices.length > 0 && selectedServices.every((s) => s.completed);
 
   useEffect(() => {
     const first = selectedServices.find(
-      s => s?.options.filter(o => !o.isDefault).length >= 1
+      (s) => s?.options.filter((o) => !o.isDefault).length >= 1
     );
     setFirstServiceToConfigure(first);
   }, [selectedServices]);
@@ -60,13 +60,13 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
   ): BeautyService | undefined => {
     let next: BeautyService = undefined;
     const currentIndex = selectedServices.findIndex(
-      s => s.title === current.title
+      (s) => s.title === current.title
     );
     const start = Math.max(currentIndex + 1, 0);
 
     for (let i = start; i < selectedServices.length; i++) {
       const s = selectedServices[i];
-      if (s?.options.filter(o => !o.isDefault).length >= 1) {
+      if (s?.options.filter((o) => !o.isDefault).length >= 1) {
         next = s;
         break;
       }
@@ -76,12 +76,12 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
   };
 
   const selectService = (service: BeautyService, selected: boolean = true) => {
-    setAllServices(old => {
+    setAllServices((old) => {
       const tmp = [...old];
       tmp[service.index] = {
         ...service,
         selected,
-        options: [...(service.options || [])]
+        options: [...(service.options || [])],
       };
       return tmp;
     });
@@ -92,13 +92,15 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
     service: BeautyService,
     selected: boolean = true
   ) => {
-    setAllServices(prev => {
+    setAllServices((prev) => {
       const tmp = prev.slice();
-      const optionsCopy = [...service.options].map(o => {
+      const optionsCopy = [...service.options].map((o) => {
         o.selected = !service.singleOption && o.selected;
         return o;
       });
-      const optionIndex = optionsCopy.findIndex(o => o.title === option.title);
+      const optionIndex = optionsCopy.findIndex(
+        (o) => o.title === option.title
+      );
       optionsCopy[optionIndex] = { ...option, selected };
       tmp[service.index] = { ...service, options: optionsCopy };
       return tmp;
@@ -106,7 +108,7 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
   };
 
   const findServiceByName = (name: string): BeautyService =>
-    allServices.find(s => s.title === name);
+    allServices.find((s) => s.title === name);
 
   const markOptionComplete = (
     serviceName: string,
@@ -114,16 +116,16 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
     specifier: "left" | "right" | "force" | "both" = "both"
   ): void => {
     if (specifier === "force") {
-      setAllServices(prev => {
+      setAllServices((prev) => {
         const copy = prev.slice();
-        const service = copy.find(s => s.title === serviceName);
+        const service = copy.find((s) => s.title === serviceName);
         copy[service.index] = { ...service, completed: true };
         return copy;
       });
     } else {
-      setAllServices(prev => {
+      setAllServices((prev) => {
         const copy = prev.slice();
-        const service = copy.find(s => s.title === serviceName);
+        const service = copy.find((s) => s.title === serviceName);
         const stalePartial = service.partialCompletion || {};
         const optionCompletion = stalePartial[optionName] || {};
         optionCompletion[specifier] = true;
@@ -136,8 +138,8 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
           completed,
           partialCompletion: {
             ...stalePartial,
-            [optionName]: { ...optionCompletion }
-          }
+            [optionName]: { ...optionCompletion },
+          },
         };
 
         return copy;
@@ -157,11 +159,11 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
     firstServiceToConfigure,
     markOptionComplete,
     sessionComplete,
-    reset
+    reset,
   };
 };
 
-export const BeautyServiceProvider = props => (
+export const BeautyServiceProvider = (props) => (
   <BeautyServiceContext.Provider value={configureBeautyServiceContext()}>
     {props.children}
   </BeautyServiceContext.Provider>

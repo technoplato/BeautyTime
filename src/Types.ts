@@ -1,8 +1,8 @@
-export type BeautyService = {
+export type Service = {
   title: string;
   selected: boolean;
   index: number;
-  options?: BeautyServiceOption[];
+  options?: Option[];
   // True if only one single option can be selected
   singleOption: boolean;
   // Indicates whether a separate timer is needed for left and right side
@@ -14,7 +14,7 @@ export type BeautyService = {
   allowForce?: boolean;
 };
 
-export type BeautyServiceOption = {
+export type Option = {
   title: string;
   // Times that must run in the order they are in the array
   sequential: Timing[];

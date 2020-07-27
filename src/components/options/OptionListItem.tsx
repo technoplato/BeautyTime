@@ -1,15 +1,15 @@
 import { default as React } from "react";
 import { TouchableWithoutFeedback, View } from "react-native";
 import { Title } from "react-native-paper";
-import HeartButton from "../HeartButton";
-import { BeautyService, BeautyServiceOption } from "../Types";
+import HeartButton from "../../HeartButton";
+import { Service, Option } from "../../Types";
 
 interface Props {
   onToggle: (nowSelected: boolean) => void;
-  option: BeautyServiceOption;
+  option: Option;
 }
 
-const BeautyServiceListItem = ({ onToggle, option }: Props) => {
+const OptionListItem = ({ onToggle, option }: Props) => {
   return (
     <TouchableWithoutFeedback onPress={() => onToggle(!option.selected)}>
       <View
@@ -17,7 +17,7 @@ const BeautyServiceListItem = ({ onToggle, option }: Props) => {
           width: "100%",
           paddingHorizontal: 60,
           flexDirection: "row",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <HeartButton
@@ -30,4 +30,4 @@ const BeautyServiceListItem = ({ onToggle, option }: Props) => {
   );
 };
 
-export default BeautyServiceListItem;
+export default OptionListItem;

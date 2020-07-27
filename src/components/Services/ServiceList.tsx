@@ -1,18 +1,18 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import BeautyServiceListItem from "./BeautyServiceListItem";
-import useBeautyServices from "./BeautyServicesContext";
-import { BeautyService } from "../Types";
+import ServiceListItem from "./ServiceListItem";
+import useBeautyServices from "./ServicesContext";
+import { BeautyService } from "../../Types";
 
-const BeautyServiceList = () => {
+const ServiceList = () => {
   const { allServices, selectService } = useBeautyServices();
   return (
     <View style={styles.container}>
       {allServices.map((service: BeautyService) => {
         return (
-          <BeautyServiceListItem
+          <ServiceListItem
             key={service.title}
-            onToggle={selected => selectService(service, selected)}
+            onToggle={(selected) => selectService(service, selected)}
             service={service}
           />
         );
@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 });
 
-export default BeautyServiceList;
+export default ServiceList;

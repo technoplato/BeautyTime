@@ -1,8 +1,8 @@
 import { default as React } from "react";
 import { TouchableWithoutFeedback, View } from "react-native";
 import { Title } from "react-native-paper";
-import HeartButton from "../HeartButton";
-import { BeautyService } from "../Types";
+import HeartButton from "../../HeartButton";
+import { BeautyService } from "../../Types";
 
 interface Props {
   onToggle: (nowSelected: boolean) => void;
@@ -16,7 +16,7 @@ const BeautyServiceListItem = ({ onToggle, service }: Props) => {
         style={{
           width: 230,
           flexDirection: "row",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <HeartButton
