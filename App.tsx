@@ -15,7 +15,6 @@ import OptionsSelectionScreen from "./src/screens/OptionsSelectionScreen";
 import ActiveServicesScreen from "./src/screens/ActiveServicesScreen";
 import SessionCompleteScreen from "./src/screens/SessionCompleteScreen";
 
-// TODO: rename to ActiveServiceScreen or soethignh
 const Stack = createStackNavigator();
 
 const App = () => {
