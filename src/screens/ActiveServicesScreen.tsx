@@ -31,10 +31,12 @@ const TimerListItemSegment = ({
   right,
   onStepCompleted,
 }: TimerListItemSegmentProps) => {
-  const [step, setStep] = useState<number>(0);
   const [repeats, setRepeats] = useState<number>(0);
-  const [serviceCompleted, setServiceCompleted] = useState<boolean>(false);
   const [flashing, flashBackground] = useState<boolean>(false);
+
+  console.log(steps);
+  const currentStep = steps.find((s) => !!s.completed === false);
+  console.log({ currentStep });
 
   const { time, start, reset, isRunning } = useTimer({
     timerType: "DECREMENTAL",
@@ -43,18 +45,17 @@ const TimerListItemSegment = ({
     // initialTime: currentStep.seconds
   });
 
-  const count = steps.length;
-  const currentStep = steps[step];
-
   const hideTime = currentStep.modifier === HIDE_TIME_MODIFIER;
-  const stepComplete = time === endTime;
   const doRepeat = currentStep.modifier === REPEAT_UNTIL_DONE_MODIFIER;
 
+  const stepComplete = time === endTime;
+  const serviceCompleted = service.completed;
+
   useEffect(() => {
-    if (serviceCompleted) {
+    if (stepComplete) {
       onStepCompleted(currentStep);
     }
-  }, [serviceCompleted]);
+  }, [stepComplete]);
 
   useEffect(() => {
     if (stepComplete && !serviceCompleted) {
@@ -72,11 +73,8 @@ const TimerListItemSegment = ({
     } else if (doRepeat) {
       setRepeats(repeats + 1);
       reset();
-    } else if (step === count - 1) {
-      setServiceCompleted(true);
     } else if (stepComplete) {
       reset();
-      setStep(step + 1);
     }
   };
   return (
@@ -106,7 +104,7 @@ const TimerListItemSegment = ({
           {left && <Text>LEFT</Text>}
           {right && <Text style={{ textAlign: "right" }}>RIGHT</Text>}
           <Text style={{ textAlign: right ? "right" : "left" }}>
-            {currentStep.title} {repeats !== 0 && `(${step + 1 + repeats})`}
+            {currentStep.title} {repeats !== 0 && `(${1 + repeats})`}
           </Text>
           {!hideTime && <Text>Remaining: {formatDuration(time)}</Text>}
         </Animatable.View>
@@ -125,7 +123,8 @@ const TimerListItem = ({ option, service }) => {
     stepTitle: string,
     specifier: string
   ) => {
-    markStepComplete(service.title, option.title, stepTitle, specifier);
+    console.log({ option, stepTitle, specifier });
+    markStepComplete(service.index, option.title, stepTitle, specifier);
   };
 
   return useMemo(() => {
@@ -239,7 +238,7 @@ const ActiveServicesScreen = ({ navigation }) => {
         }}
       />
     );
-  }, [sections.length, completedCount]);
+  }, [selectedServices]);
 
   return (
     <View style={ApplicationStyles.screen.timers}>

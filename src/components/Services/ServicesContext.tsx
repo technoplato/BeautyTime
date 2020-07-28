@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useImmer } from "use-immer";
+
 import servicesJSON from "../../../BEAUTY_SERVICES";
 import { Service, Option } from "../../Types";
 
 type ServicesContextProps =
   | {
       selectService: (service: Service, boolean) => void;
-      allServices: Service[];
+      services: Service[];
       selectedServices: Service[];
       getNextSelectedServiceWithOptions: (
         current: Service
@@ -18,7 +20,7 @@ type ServicesContextProps =
       findServiceByName: (string) => Service;
       firstServiceToConfigure: Service;
       markStepComplete: (
-        serviceTitle: string,
+        serviceIndex: number,
         optionTitle: string,
         stepTitle: string,
         specifier: string
@@ -31,17 +33,16 @@ type ServicesContextProps =
 export const ServiceContext = createContext<ServicesContextProps>(undefined);
 
 const configureServiceContext = (): ServicesContextProps => {
-  const [allServices, setAllServices] = useState<Service[]>(servicesJSON);
+  const [services, updateServices] = useImmer<Service[]>(servicesJSON);
   const [firstServiceToConfigure, setFirstServiceToConfigure] = useState<
     Service
   >(null);
-  const selectedServices = allServices.filter((service) => service.selected);
+  const selectedServices = services.filter((service) => service.selected);
+  console.log(selectedServices);
 
   const sessionComplete: boolean =
     selectedServices.length > 0 && selectedServices.every((s) => s.completed);
 
-  console.table(selectedServices);
-  console.log({ sessionComplete });
   useEffect(() => {
     const first = selectedServices.find(
       (s) => s?.options.filter((o) => !o.isDefault).length >= 1
@@ -69,70 +70,65 @@ const configureServiceContext = (): ServicesContextProps => {
     return next;
   };
 
+  // function updateName(name) {
+  //   updatePerson((draft) => {
+  //     draft.name = name;
+  //   });
+  // }
+
   const selectService = (service: Service, selected: boolean = true) => {
-    setAllServices((old) => {
-      const tmp = [...old];
-      tmp[service.index] = {
-        ...service,
-        selected,
-        options: [...(service.options || [])],
-      };
-      return tmp;
+    updateServices((draft) => {
+      draft[service.index].selected = selected;
     });
   };
 
   const selectOptionForService = (
     option: Option,
-    service: Service,
+    s: Service,
     selected: boolean = true
   ) => {
-    setAllServices((prev) => {
-      const tmp = prev.slice();
-      const optionsCopy = [...service.options].map((o) => {
-        o.selected = !service.singleOption && o.selected;
-        return o;
-      });
-      const optionIndex = optionsCopy.findIndex(
-        (o) => o.title === option.title
-      );
-      optionsCopy[optionIndex] = { ...option, selected };
-      tmp[service.index] = { ...service, options: optionsCopy };
-      return tmp;
+    updateServices((draft) => {
+      const service = draft[s.index];
+      if (service.singleOption) {
+        service.options = service.options.map((o) => ({
+          ...o,
+          selected: false,
+        }));
+      }
+      const index = service.options.findIndex((o) => o.title === option.title);
+      service.options[index] = { ...option, selected };
     });
   };
 
   const findServiceByName = (name: string): Service =>
-    allServices.find((s) => s.title === name);
+    services.find((s) => s.title === name);
 
   const markStepComplete = (
-    serviceTitle: string,
+    serviceIndex: number,
     optionTitle: string,
     // If undefined, force next uncompleted step to be completed
     stepTitle: string | undefined,
     specifier: "left" | "right" | "both" = "both"
   ): void => {
-    setAllServices((prev) => {
-      const servicesCopy = prev.slice();
-      const service = servicesCopy.find((s) => s.title === serviceTitle);
-      const selectedOption: Option = service.options.find(
-        (o) => o.title === optionTitle
-      );
+    updateServices((draft) => {
+      const service = draft[serviceIndex];
+      const options = service.options;
+      const optionIndex = options.findIndex((o) => o.title === optionTitle);
+      const option = options[optionIndex];
+
       if (stepTitle === undefined) {
         specifier = "both";
-        for (let i = 0; i < selectedOption.steps.length - 1; i++) {
-          const step = selectedOption.steps[i];
+        for (let i = 0; i < option.steps.length - 1; i++) {
+          const step = option.steps[i];
           if (!step.completed) {
             stepTitle = step.title;
+            break;
           }
         }
       }
-      const step = selectedOption.steps.find((s) => s.title === stepTitle);
 
-      console.table(serviceTitle, optionTitle, stepTitle, specifier);
-
-      console.log(service);
-      console.log(selectedOption);
-      console.log(step);
+      const stepIndex = option.steps.findIndex((s) => s.title === stepTitle);
+      const step = option.steps[stepIndex];
 
       const stalePartial = service.partialCompletion || {};
       const stepCompletion = stalePartial[stepTitle] || {};
@@ -140,27 +136,40 @@ const configureServiceContext = (): ServicesContextProps => {
       const stepCompleted =
         stepCompletion["both"] ||
         (stepCompletion["left"] && stepCompletion["right"]);
-      const serviceCompleted = selectedOption.steps.every((s) => s.completed);
+      const serviceCompleted = option.steps.every((s) => s.completed);
 
-      servicesCopy[service.index] = {
+      step.completed = stepCompleted;
+      options[optionIndex].steps[stepIndex] = step;
+      draft[serviceIndex] = {
         ...service,
         completed: serviceCompleted,
-        options: [],
+        options,
         partialCompletion: {
           ...stalePartial,
-          [stepTitle]: { ...stepCompletion },
+          [stepTitle]: stepCompletion,
         },
       };
-
-      return servicesCopy;
+      // servicesCopy[service.index] = {
+      //   ...service,
+      //   completed: serviceCompleted,
+      //   options: [],
+      //   partialCompletion: {
+      //     ...stalePartial,
+      //     [stepTitle]: { ...stepCompletion },
+      //   },
+      // };
+      // return servicesCopy;
     });
   };
 
-  const reset = () => setAllServices(servicesJSON);
+  const reset = () =>
+    updateServices((draft) => {
+      draft = servicesJSON;
+    });
 
   return {
     selectService,
-    allServices,
+    services,
     selectedServices,
     getNextSelectedServiceWithOptions,
     selectOptionForService,

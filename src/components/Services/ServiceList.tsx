@@ -2,13 +2,13 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import ServiceListItem from "./ServiceListItem";
 import useBeautyServices from "./ServicesContext";
-import { BeautyService } from "../../Types";
+import { Service } from "../../Types";
 
 const ServiceList = () => {
-  const { allServices, selectService } = useBeautyServices();
+  const { services, selectService } = useBeautyServices();
   return (
     <View style={styles.container}>
-      {allServices.map((service: BeautyService) => {
+      {services.map((service: Service) => {
         return (
           <ServiceListItem
             key={service.title}
