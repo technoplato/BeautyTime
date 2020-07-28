@@ -1,32 +1,26 @@
-import React, {
-  Context,
-  createContext,
-  Provider,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import servicesJSON from "../../../BEAUTY_SERVICES";
-import { BeautyService, BeautyServiceOption } from "../../Types";
+import { Service, Option } from "../../Types";
 
-type BeautyServicesContextProps =
+type ServicesContextProps =
   | {
-      selectService: (service: BeautyService, boolean) => void;
-      allServices: BeautyService[];
-      selectedServices: BeautyService[];
+      selectService: (service: Service, boolean) => void;
+      allServices: Service[];
+      selectedServices: Service[];
       getNextSelectedServiceWithOptions: (
-        current: BeautyService
-      ) => BeautyService | undefined;
+        current: Service
+      ) => Service | undefined;
       selectOptionForService: (
-        options: BeautyServiceOption,
-        service: BeautyService,
+        options: Option,
+        service: Service,
         selected: boolean
       ) => void;
-      findServiceByName: (string) => BeautyService;
-      firstServiceToConfigure: BeautyService;
-      markOptionComplete: (
-        serviceName: string,
-        optionName: string,
+      findServiceByName: (string) => Service;
+      firstServiceToConfigure: Service;
+      markStepComplete: (
+        serviceTitle: string,
+        optionTitle: string,
+        stepTitle: string,
         specifier: string
       ) => void;
       sessionComplete: boolean;
@@ -34,20 +28,20 @@ type BeautyServicesContextProps =
     }
   | undefined;
 
-export const BeautyServiceContext = createContext<BeautyServicesContextProps>(
-  undefined
-);
+export const ServiceContext = createContext<ServicesContextProps>(undefined);
 
-const configureBeautyServiceContext = (): BeautyServicesContextProps => {
-  const [allServices, setAllServices] = useState<BeautyService[]>(servicesJSON);
+const configureServiceContext = (): ServicesContextProps => {
+  const [allServices, setAllServices] = useState<Service[]>(servicesJSON);
   const [firstServiceToConfigure, setFirstServiceToConfigure] = useState<
-    BeautyService
+    Service
   >(null);
   const selectedServices = allServices.filter((service) => service.selected);
 
   const sessionComplete: boolean =
     selectedServices.length > 0 && selectedServices.every((s) => s.completed);
 
+  console.table(selectedServices);
+  console.log({ sessionComplete });
   useEffect(() => {
     const first = selectedServices.find(
       (s) => s?.options.filter((o) => !o.isDefault).length >= 1
@@ -56,9 +50,9 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
   }, [selectedServices]);
 
   const getNextSelectedServiceWithOptions = (
-    current: BeautyService
-  ): BeautyService | undefined => {
-    let next: BeautyService = undefined;
+    current: Service
+  ): Service | undefined => {
+    let next: Service = undefined;
     const currentIndex = selectedServices.findIndex(
       (s) => s.title === current.title
     );
@@ -75,7 +69,7 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
     return next;
   };
 
-  const selectService = (service: BeautyService, selected: boolean = true) => {
+  const selectService = (service: Service, selected: boolean = true) => {
     setAllServices((old) => {
       const tmp = [...old];
       tmp[service.index] = {
@@ -88,8 +82,8 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
   };
 
   const selectOptionForService = (
-    option: BeautyServiceOption,
-    service: BeautyService,
+    option: Option,
+    service: Service,
     selected: boolean = true
   ) => {
     setAllServices((prev) => {
@@ -107,44 +101,59 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
     });
   };
 
-  const findServiceByName = (name: string): BeautyService =>
+  const findServiceByName = (name: string): Service =>
     allServices.find((s) => s.title === name);
 
-  const markOptionComplete = (
-    serviceName: string,
-    optionName: string,
-    specifier: "left" | "right" | "force" | "both" = "both"
+  const markStepComplete = (
+    serviceTitle: string,
+    optionTitle: string,
+    // If undefined, force next uncompleted step to be completed
+    stepTitle: string | undefined,
+    specifier: "left" | "right" | "both" = "both"
   ): void => {
-    if (specifier === "force") {
-      setAllServices((prev) => {
-        const copy = prev.slice();
-        const service = copy.find((s) => s.title === serviceName);
-        copy[service.index] = { ...service, completed: true };
-        return copy;
-      });
-    } else {
-      setAllServices((prev) => {
-        const copy = prev.slice();
-        const service = copy.find((s) => s.title === serviceName);
-        const stalePartial = service.partialCompletion || {};
-        const optionCompletion = stalePartial[optionName] || {};
-        optionCompletion[specifier] = true;
-        const completed =
-          optionCompletion["both"] ||
-          (optionCompletion["left"] && optionCompletion["right"]);
+    setAllServices((prev) => {
+      const servicesCopy = prev.slice();
+      const service = servicesCopy.find((s) => s.title === serviceTitle);
+      const selectedOption: Option = service.options.find(
+        (o) => o.title === optionTitle
+      );
+      if (stepTitle === undefined) {
+        specifier = "both";
+        for (let i = 0; i < selectedOption.steps.length - 1; i++) {
+          const step = selectedOption.steps[i];
+          if (!step.completed) {
+            stepTitle = step.title;
+          }
+        }
+      }
+      const step = selectedOption.steps.find((s) => s.title === stepTitle);
 
-        copy[service.index] = {
-          ...service,
-          completed,
-          partialCompletion: {
-            ...stalePartial,
-            [optionName]: { ...optionCompletion },
-          },
-        };
+      console.table(serviceTitle, optionTitle, stepTitle, specifier);
 
-        return copy;
-      });
-    }
+      console.log(service);
+      console.log(selectedOption);
+      console.log(step);
+
+      const stalePartial = service.partialCompletion || {};
+      const stepCompletion = stalePartial[stepTitle] || {};
+      stepCompletion[specifier] = true;
+      const stepCompleted =
+        stepCompletion["both"] ||
+        (stepCompletion["left"] && stepCompletion["right"]);
+      const serviceCompleted = selectedOption.steps.every((s) => s.completed);
+
+      servicesCopy[service.index] = {
+        ...service,
+        completed: serviceCompleted,
+        options: [],
+        partialCompletion: {
+          ...stalePartial,
+          [stepTitle]: { ...stepCompletion },
+        },
+      };
+
+      return servicesCopy;
+    });
   };
 
   const reset = () => setAllServices(servicesJSON);
@@ -157,17 +166,16 @@ const configureBeautyServiceContext = (): BeautyServicesContextProps => {
     selectOptionForService,
     findServiceByName,
     firstServiceToConfigure,
-    markOptionComplete,
+    markStepComplete,
     sessionComplete,
     reset,
   };
 };
 
-export const BeautyServiceProvider = (props) => (
-  <BeautyServiceContext.Provider value={configureBeautyServiceContext()}>
+export const ServiceProvider = (props) => (
+  <ServiceContext.Provider value={configureServiceContext()}>
     {props.children}
-  </BeautyServiceContext.Provider>
+  </ServiceContext.Provider>
 );
 
-export default () =>
-  useContext<BeautyServicesContextProps>(BeautyServiceContext);
+export default () => useContext<ServicesContextProps>(ServiceContext);

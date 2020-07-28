@@ -4,51 +4,55 @@ import { Button, Headline, Card } from "react-native-paper";
 import { useTimer } from "use-timer";
 import * as Animatable from "react-native-animatable";
 import useBeautyServices from "../components/Services/ServicesContext";
-import { Service, Timing, REPEAT_UNTIL_DONE_SIGNIFIER, Option } from "../Types";
+import {
+  Service,
+  Step,
+  REPEAT_UNTIL_DONE_MODIFIER,
+  Option,
+  HIDE_TIME_MODIFIER,
+} from "../Types";
 import ApplicationStyles from "../Themes/ApplicationStyles";
 import formatDuration from "../Utilities/formatDuration";
 
 type TimerListItemSegmentProps = {
   service: Service;
-  sequential: Timing[];
+  steps: Step[];
   left?: boolean;
   right?: boolean;
-  onOptionComplete: () => void;
+  onStepCompleted: (step: Step) => void;
 };
 
 const endTime = 0;
 
 const TimerListItemSegment = ({
   service,
-  sequential,
+  steps,
   left,
   right,
-  onOptionComplete,
+  onStepCompleted,
 }: TimerListItemSegmentProps) => {
   const [step, setStep] = useState<number>(0);
   const [repeats, setRepeats] = useState<number>(0);
-  const [manuallyCompleted, setManuallyCompleted] = useState(false);
   const [serviceCompleted, setServiceCompleted] = useState<boolean>(false);
-  const count = sequential.length;
-  const currentOption = sequential[step];
+  const [flashing, flashBackground] = useState<boolean>(false);
+
   const { time, start, reset, isRunning } = useTimer({
-    // timerType: "DECREMENTAL",
-    // endTime,
-    // initialTime: currentOption.seconds
     timerType: "DECREMENTAL",
     endTime,
     initialTime: 3,
+    // initialTime: currentStep.seconds
   });
 
-  const canManuallyCompleteStep = currentOption.seconds === -1;
+  const count = steps.length;
+  const currentStep = steps[step];
 
-  const stepComplete = manuallyCompleted || time === endTime;
-
-  const [flashing, flashBackground] = useState<boolean>(false);
+  const hideTime = currentStep.modifier === HIDE_TIME_MODIFIER;
+  const stepComplete = time === endTime;
+  const doRepeat = currentStep.modifier === REPEAT_UNTIL_DONE_MODIFIER;
 
   useEffect(() => {
     if (serviceCompleted) {
-      onOptionComplete();
+      onStepCompleted(currentStep);
     }
   }, [serviceCompleted]);
 
@@ -61,15 +65,15 @@ const TimerListItemSegment = ({
   }, [stepComplete, serviceCompleted]);
 
   const onPress = () => {
-    if (serviceCompleted || isRunning) {
+    if (serviceCompleted || isRunning || hideTime) {
       return;
     } else if (!isRunning && !stepComplete) {
       start();
-    } else if (step === count - 1) {
-      setServiceCompleted(true);
-    } else if (sequential[step + 1].title === REPEAT_UNTIL_DONE_SIGNIFIER) {
+    } else if (doRepeat) {
       setRepeats(repeats + 1);
       reset();
+    } else if (step === count - 1) {
+      setServiceCompleted(true);
     } else if (stepComplete) {
       reset();
       setStep(step + 1);
@@ -89,7 +93,7 @@ const TimerListItemSegment = ({
           iterationCount={"infinite"}
           direction={"alternate"}
           onTransitionEnd={() => {
-            if (stepComplete && !canManuallyCompleteStep) {
+            if (stepComplete) {
               flashBackground(!flashing);
             }
           }}
@@ -102,15 +106,9 @@ const TimerListItemSegment = ({
           {left && <Text>LEFT</Text>}
           {right && <Text style={{ textAlign: "right" }}>RIGHT</Text>}
           <Text style={{ textAlign: right ? "right" : "left" }}>
-            {currentOption.title} {repeats !== 0 && `(${step + 1 + repeats})`}
+            {currentStep.title} {repeats !== 0 && `(${step + 1 + repeats})`}
           </Text>
-          {/* TODO: Add click to complete to all steps */}
-          {/* TODO: Add crash reporting from sentry */}
-          {canManuallyCompleteStep ? (
-            <Text>Click to Complete</Text>
-          ) : (
-            <Text>Remaining: {formatDuration(time)}</Text>
-          )}
+          {!hideTime && <Text>Remaining: {formatDuration(time)}</Text>}
         </Animatable.View>
       ) : (
         <Text style={{ padding: 8 }}>Option Completed! ✅</Text>
@@ -120,11 +118,14 @@ const TimerListItemSegment = ({
 };
 
 const TimerListItem = ({ option, service }) => {
-  const { markOptionComplete } = useBeautyServices();
+  const { markStepComplete } = useBeautyServices();
 
-  const handleOptionComplete = (option: Option, specifier: string) => {
-    // TODO: fix name, marks entire service complete, not just the option
-    markOptionComplete(service.title, option.title, specifier);
+  const markStepCompleted = (
+    option: Option,
+    stepTitle: string,
+    specifier: string
+  ) => {
+    markStepComplete(service.title, option.title, stepTitle, specifier);
   };
 
   return useMemo(() => {
@@ -135,15 +136,19 @@ const TimerListItem = ({ option, service }) => {
             <>
               <TimerListItemSegment
                 service={service}
-                onOptionComplete={() => handleOptionComplete(option, "left")}
+                onStepCompleted={(completedStep) =>
+                  markStepCompleted(option, completedStep.title, "left")
+                }
                 left
-                sequential={option.sequential}
+                steps={option.steps}
               />
               <TimerListItemSegment
                 service={service}
-                onOptionComplete={() => handleOptionComplete(option, "right")}
+                onStepCompleted={(completedStep) =>
+                  markStepCompleted(option, completedStep.title, "right")
+                }
                 right
-                sequential={option.sequential}
+                steps={option.steps}
               />
             </>
           )}
@@ -151,33 +156,27 @@ const TimerListItem = ({ option, service }) => {
           {!option.leftRight && (
             <TimerListItemSegment
               service={service}
-              onOptionComplete={() => {
-                handleOptionComplete(option, "both");
-              }}
-              sequential={option.sequential}
+              onStepCompleted={(completedStep) =>
+                markStepCompleted(option, completedStep.title, "both")
+              }
+              steps={option.steps}
             />
           )}
         </View>
         <Button
           color="white"
           mode="contained"
-          onPress={() => handleOptionComplete(option, "both")}
+          onPress={() => markStepCompleted(option, undefined, "both")}
         >
           Mark Step Complete
         </Button>
-        <Text>Shit</Text>
       </View>
     );
   }, [service, option]);
 };
 
 const ActiveServicesScreen = ({ navigation }) => {
-  const {
-    selectedServices,
-    markOptionComplete,
-    sessionComplete,
-    reset,
-  } = useBeautyServices();
+  const { selectedServices, sessionComplete, reset } = useBeautyServices();
 
   const { time, start, pause, isRunning } = useTimer();
 
@@ -220,35 +219,6 @@ const ActiveServicesScreen = ({ navigation }) => {
   const list = useMemo(() => {
     return (
       <SectionList
-        renderSectionFooter={(thing) => {
-          if (!thing) {
-            return null;
-          } else {
-            // Ew
-            const service: Service = thing.section.service;
-
-            const showCompleteServiceButton =
-              service.allowForce && !service.completed;
-            if (!showCompleteServiceButton) {
-              return null;
-            }
-
-            return (
-              <View style={{ padding: 14 }}>
-                <Button
-                  disabled={selectedServices.length === 0}
-                  color="white"
-                  mode="contained"
-                  onPress={() =>
-                    markOptionComplete(thing.section.title, null, "force")
-                  }
-                >
-                  Mark Service Complete
-                </Button>
-              </View>
-            );
-          }
-        }}
         showsVerticalScrollIndicator={false}
         sections={sections}
         keyExtractor={(item, index) => {

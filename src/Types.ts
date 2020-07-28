@@ -9,22 +9,23 @@ export type Service = {
   leftRight: boolean;
   completed: boolean;
   partialCompletion?: object;
-  // Some services require the user to press a button to end the service.
-  // Allow force will be true when that button should be shown.
-  allowForce?: boolean;
 };
 
 export type Option = {
   title: string;
   // Times that must run in the order they are in the array
-  sequential: Timing[];
+  steps: Step[];
   selected: boolean;
   isDefault?: boolean;
 };
 
-export type Timing = {
+export type Step = {
   title: string;
   seconds: number;
+  completed?: boolean;
+  modifier?: string;
 };
 
-export const REPEAT_UNTIL_DONE_SIGNIFIER = "*";
+// Any more and this needs to become an enum or something
+export const REPEAT_UNTIL_DONE_MODIFIER = "*";
+export const HIDE_TIME_MODIFIER = "**";

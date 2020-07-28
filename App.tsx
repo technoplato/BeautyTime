@@ -2,7 +2,7 @@ import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 
 import useCustomFonts from "./src/Fonts/useCustomFonts";
-import { BeautyServiceProvider } from "./src/components/Services/ServicesContext";
+import { ServiceProvider } from "./src/components/Services/ServicesContext";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useKeepAwake } from "expo-keep-awake";
 
@@ -25,7 +25,7 @@ const App = () => {
   return (
     <NavigationContainer>
       <PaperProvider theme={ApplicationStyles.theme}>
-        <BeautyServiceProvider>
+        <ServiceProvider>
           <Stack.Navigator
             screenOptions={{
               header: () => (
@@ -63,7 +63,7 @@ const App = () => {
               component={SessionCompleteScreen}
             />
           </Stack.Navigator>
-        </BeautyServiceProvider>
+        </ServiceProvider>
       </PaperProvider>
     </NavigationContainer>
   );
