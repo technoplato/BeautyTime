@@ -9,7 +9,7 @@ const optionsSelectionButtonText = (
   current: Service,
   next: Service
 ): string => {
-  const selectedOptionsCount = current.options.filter((o) => o.selected).length;
+  const selectedOptionsCount = current.options.filter(o => o.selected).length;
 
   if (selectedOptionsCount === 0 && !current.singleOption) {
     return "Please Select at Least One Option";
@@ -25,7 +25,7 @@ const optionsSelectionButtonText = (
 const OptionsSelectionFooter = ({ route, navigation }) => {
   const {
     findServiceByName,
-    getNextSelectedServiceWithOptions,
+    getNextSelectedServiceWithOptions
   } = useBeautyServices();
   const service = findServiceByName(route.params.name);
   const nextService = getNextSelectedServiceWithOptions(service);
@@ -35,13 +35,13 @@ const OptionsSelectionFooter = ({ route, navigation }) => {
       onPress={() => {
         if (nextService) {
           navigation.navigate("Options", {
-            name: nextService.title,
+            name: nextService.title
           });
         } else {
           navigation.navigate("ActiveServices");
         }
       }}
-      disabled={service.options.filter((o) => o.selected).length === 0}
+      disabled={service.options.filter(o => o.selected).length === 0}
     />
   );
 };

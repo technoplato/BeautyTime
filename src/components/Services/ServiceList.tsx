@@ -12,7 +12,7 @@ const ServiceList = () => {
         return (
           <ServiceListItem
             key={service.title}
-            onToggle={(selected) => selectService(service, selected)}
+            onToggle={selected => selectService(service, selected)}
             service={service}
           />
         );
@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-  },
+    alignItems: "center"
+  }
 });
 
 export default ServiceList;

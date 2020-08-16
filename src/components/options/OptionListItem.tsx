@@ -17,7 +17,7 @@ const OptionListItem = ({ onToggle, option }: Props) => {
           width: "100%",
           paddingHorizontal: 60,
           flexDirection: "row",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         <HeartButton

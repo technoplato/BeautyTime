@@ -21,7 +21,7 @@ const OptionList = ({ service }: Props) => {
         return (
           <OptionListItem
             key={option.title}
-            onToggle={(selected) =>
+            onToggle={selected =>
               selectOptionForService(option, service, selected)
             }
             option={option}
@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
     width: "100%",
 
     justifyContent: "center",
-    alignItems: "center",
-  },
+    alignItems: "center"
+  }
 });
 
 export default OptionList;

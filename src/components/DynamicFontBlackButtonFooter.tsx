@@ -8,8 +8,8 @@ const DynamicFontBlackButtonFooter = ({ title, onPress, disabled }) => {
       alignItems: "center",
       marginTop: 50,
       backgroundColor: "#000000",
-      padding: 10,
-    },
+      padding: 10
+    }
   ];
 
   const textStyles = [
@@ -19,8 +19,8 @@ const DynamicFontBlackButtonFooter = ({ title, onPress, disabled }) => {
       padding: 22,
       paddingBottom: 80,
       fontFamily: "champagne-limousines-bold",
-      color: "white",
-    },
+      color: "white"
+    }
   ];
 
   if (disabled) {

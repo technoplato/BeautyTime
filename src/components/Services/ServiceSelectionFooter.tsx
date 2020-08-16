@@ -29,7 +29,7 @@ const ServiceSelectionFooter = ({ navigation }) => {
       onPress={() => {
         if (firstServiceToConfigure) {
           navigation.navigate("Options", {
-            name: firstServiceToConfigure.title,
+            name: firstServiceToConfigure.title
           });
         } else {
           navigation.navigate("ActiveServices");

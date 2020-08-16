@@ -9,7 +9,7 @@ import {
   Step,
   REPEAT_UNTIL_DONE_MODIFIER,
   Option,
-  HIDE_TIME_MODIFIER,
+  HIDE_TIME_MODIFIER
 } from "../Types";
 import ApplicationStyles from "../Themes/ApplicationStyles";
 import formatDuration from "../Utilities/formatDuration";
@@ -29,19 +29,19 @@ const TimerListItemSegment = ({
   steps,
   left,
   right,
-  onStepCompleted,
+  onStepCompleted
 }: TimerListItemSegmentProps) => {
   const [repeats, setRepeats] = useState<number>(0);
   const [flashing, flashBackground] = useState<boolean>(false);
 
   console.log(steps);
-  const currentStep = steps.find((s) => !!s.completed === false);
+  const currentStep = steps.find(s => !!s.completed === false);
   console.log({ currentStep });
 
   const { time, start, reset, isRunning } = useTimer({
     timerType: "DECREMENTAL",
     endTime,
-    initialTime: 3,
+    initialTime: 3
     // initialTime: currentStep.seconds
   });
 
@@ -81,7 +81,7 @@ const TimerListItemSegment = ({
     <Card
       style={{
         flex: 1,
-        marginHorizontal: 4,
+        marginHorizontal: 4
       }}
       onPress={onPress}
     >
@@ -98,7 +98,7 @@ const TimerListItemSegment = ({
           style={{
             padding: 8,
             alignItems: right ? "flex-end" : "flex-start",
-            backgroundColor: flashing ? "red" : "white",
+            backgroundColor: flashing ? "red" : "white"
           }}
         >
           {left && <Text>LEFT</Text>}
@@ -135,7 +135,7 @@ const TimerListItem = ({ option, service }) => {
             <>
               <TimerListItemSegment
                 service={service}
-                onStepCompleted={(completedStep) =>
+                onStepCompleted={completedStep =>
                   markStepCompleted(option, completedStep.title, "left")
                 }
                 left
@@ -143,7 +143,7 @@ const TimerListItem = ({ option, service }) => {
               />
               <TimerListItemSegment
                 service={service}
-                onStepCompleted={(completedStep) =>
+                onStepCompleted={completedStep =>
                   markStepCompleted(option, completedStep.title, "right")
                 }
                 right
@@ -155,7 +155,7 @@ const TimerListItem = ({ option, service }) => {
           {!option.leftRight && (
             <TimerListItemSegment
               service={service}
-              onStepCompleted={(completedStep) =>
+              onStepCompleted={completedStep =>
                 markStepCompleted(option, completedStep.title, "both")
               }
               steps={option.steps}
@@ -194,24 +194,24 @@ const ActiveServicesScreen = ({ navigation }) => {
     }
   }, [sessionComplete]);
 
-  const sections = selectedServices.map((service) => {
+  const sections = selectedServices.map(service => {
     const data = service.options
-      .filter((o) => o.selected || o.isDefault)
-      .map((o) => ({
+      .filter(o => o.selected || o.isDefault)
+      .map(o => ({
         ...o,
-        leftRight: service.leftRight,
+        leftRight: service.leftRight
       }));
 
     return {
       title: service.title,
       data,
-      service,
+      service
     };
   });
 
   const completedCount = selectedServices
-    .filter((s) => s.completed)
-    .reduce((count) => {
+    .filter(s => s.completed)
+    .reduce(count => {
       return count + 1;
     }, 0);
 
@@ -223,7 +223,7 @@ const ActiveServicesScreen = ({ navigation }) => {
         keyExtractor={(item, index) => {
           return index + "";
         }}
-        renderItem={(sectionContainer) => {
+        renderItem={sectionContainer => {
           const item = sectionContainer.item;
 
           return (
@@ -246,7 +246,7 @@ const ActiveServicesScreen = ({ navigation }) => {
         style={{
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "white",
+          backgroundColor: "white"
         }}
       >
         <Headline>Session Length: {formatDuration(time, true)}</Headline>
@@ -260,21 +260,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 32,
-    marginHorizontal: 16,
+    marginHorizontal: 16
   },
   item: {
     padding: 12,
-    flexDirection: "row",
+    flexDirection: "row"
   },
   header: {
     fontSize: 32,
     color: "white",
     padding: 12,
-    backgroundColor: "black",
+    backgroundColor: "black"
   },
   title: {
-    fontSize: 24,
-  },
+    fontSize: 24
+  }
 });
 
 export default ActiveServicesScreen;

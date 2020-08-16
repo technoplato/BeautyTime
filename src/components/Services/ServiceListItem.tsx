@@ -16,7 +16,7 @@ const BeautyServiceListItem = ({ onToggle, service }: Props) => {
         style={{
           width: 230,
           flexDirection: "row",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         <HeartButton
