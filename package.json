@@ -11,6 +11,7 @@
     "@react-native-community/masked-view": "0.1.5",
     "@react-navigation/native": "^5.0.9",
     "@react-navigation/stack": "^5.1.1",
+    "@reduxjs/toolkit": "^1.4.0",
     "expo": "~36.0.0",
     "expo-keep-awake": "~8.0.0",
     "immer": "7.0.7",
@@ -33,6 +34,8 @@
     "@types/react": "~16.9.0",
     "@types/react-native": "~0.60.23",
     "babel-preset-expo": "~8.0.0",
+    "jest": "^26.4.0",
+    "prettier": "^2.0.5",
     "typescript": "^3.8.3"
   },
   "private": true

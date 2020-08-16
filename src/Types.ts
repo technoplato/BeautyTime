@@ -1,3 +1,50 @@
+export type Session = {
+  browsAndLashes: BrowLashService[];
+  facial: FacialService | null;
+};
+
+export type BrowLashService = {
+  name: string;
+  modifiable: boolean;
+  options: BrowLashServiceOption[];
+  steps: BrowLashServiceStep[];
+};
+
+export type BrowLashServiceOption = {
+  name: string;
+  steps: BrowLashServiceStep[];
+};
+
+export type BrowLashServiceStep = {
+  description: string;
+  leftRightSeparate: boolean;
+  howToComplete: CompletionOption;
+  duration?: number;
+  repeatAfterCompletion: boolean;
+};
+
+export type CompletionOption = "timer" | "click" | "any";
+
+export type FacialService = {
+  name: string;
+  steps: FacialStep[];
+  setupInstructions: FacialSetupInstruction[];
+};
+
+export type FacialStep = {
+  name: string;
+  howToComplete: CompletionOption;
+  duration?: number;
+};
+
+export type FacialSetupInstruction = {
+  title: string;
+};
+
+/**
+ * OLD IS BELOW
+ */
+
 export type Service = {
   title: string;
   selected: boolean;
