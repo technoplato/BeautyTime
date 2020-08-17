@@ -1,21 +1,22 @@
 export type Session = {
-  browsAndLashes: BrowLashService[];
-  facial: FacialService | null;
+  services: BeautyService[];
 };
 
-export type BrowLashService = {
+export type BeautyService = {
   name: string;
+  type: ServiceType;
   modifiable: boolean;
-  options: BrowLashServiceOption[];
-  steps: BrowLashServiceStep[];
+  options: BeautyServiceOption[];
+  steps: ServiceStep[];
+  setupInstructions?: SetupInstruction[];
 };
 
-export type BrowLashServiceOption = {
+export type BeautyServiceOption = {
   name: string;
-  steps: BrowLashServiceStep[];
+  steps: ServiceStep[];
 };
 
-export type BrowLashServiceStep = {
+export type ServiceStep = {
   description: string;
   leftRightSeparate: boolean;
   howToComplete: CompletionOption;
@@ -23,21 +24,20 @@ export type BrowLashServiceStep = {
   repeatAfterCompletion: boolean;
 };
 
-export type CompletionOption = "timer" | "click" | "any";
+export type j = "timer" | "click" | "any";
+export enum CompletionOption {
+  TIMER,
+  CLICK,
+  ANY,
+}
 
-export type FacialService = {
-  name: string;
-  steps: FacialStep[];
-  setupInstructions: FacialSetupInstruction[];
-};
+export enum ServiceType {
+  FACIAL,
+  BROWS,
+  LASHES,
+}
 
-export type FacialStep = {
-  name: string;
-  howToComplete: CompletionOption;
-  duration?: number;
-};
-
-export type FacialSetupInstruction = {
+export type SetupInstruction = {
   title: string;
 };
 

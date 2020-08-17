@@ -23,19 +23,12 @@ describe("Getting started with Redux", () => {
         browsAndLashes: [],
       });
     });
-  });
 
-  describe("actions", () => {
-    describe("toggleSelected", () => {
-      test("should create an action to toggle service selected status", () => {
-        const serviceId = 1;
-        const expectedAction = {
-          type: "session/toggleServiceSelected",
-          payload: serviceId,
-        };
+    it("has a working 'isDoingFacialSelector'", () => {
+        const facial:  = {
 
-        expect(toggleServiceSelected(1)).toEqual(expectedAction);
-      });
+        }
+      expect(servicesReducer({services: []}))
     });
   });
 });

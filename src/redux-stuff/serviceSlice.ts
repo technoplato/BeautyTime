@@ -1,10 +1,17 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { Session } from "../Types";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
+import { ServiceType, Session } from "../Types";
 
 export const INITIAL_STATE: Session = {
-  browsAndLashes: [],
-  facial: null,
+  services: [],
 };
+
+const sessionFacialSelector = (state) =>
+  state.services.find((s) => s.type === ServiceType.FACIAL);
+
+const sessionHasFacial = createSelector(
+  sessionFacialSelector,
+  (facial) => facial !== null
+);
 
 const sessionSlice = createSlice({
   name: "session",
