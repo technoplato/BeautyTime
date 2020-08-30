@@ -1,9 +1,7 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit";
-import { ServiceType, Session } from "../Types";
+import { RootState, ServiceType } from "../Types";
 
-export const INITIAL_STATE: Session = {
-  services: [],
-};
+export const INITIAL_STATE: RootState = { catalog: {}, session: [] };
 
 const sessionFacialSelector = (state) =>
   state.services.find((s) => s.type === ServiceType.FACIAL);
