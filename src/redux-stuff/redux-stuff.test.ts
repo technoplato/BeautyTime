@@ -1,7 +1,4 @@
-import servicesReducer, {
-  toggleServiceSelected,
-  INITIAL_STATE,
-} from './serviceSlice'
+import servicesReducer, { toggleServiceSelected } from './serviceSlice'
 import { DEFAULT_SERVICES } from '../../BEAUTY_SERVICES'
 import { RootState, ServiceId } from '../Types/Types'
 
@@ -24,6 +21,13 @@ describe('Session reducer', () => {
         servicesReducer(initialState, toggleServiceSelected(serviceId)),
       ).toEqual([])
     })
+  })
+
+  describe('The next button should update be disabled if no selections are made', () => {
+    const services = []
+    const nextButtonStatus = selectNextButtonStatus(services)
+
+    expect(nextButtonStatus).toEqual({ text: null, enabled: false })
   })
 
   describe('Beauty Services', () => {
