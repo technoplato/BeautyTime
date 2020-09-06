@@ -1,5 +1,5 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit";
-import { RootState, ServiceType } from "../Types";
+import { RootState, ServiceType } from "../Types/Types";
 
 export const INITIAL_STATE: RootState = { catalog: {}, session: [] };
 
