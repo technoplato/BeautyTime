@@ -2,19 +2,34 @@ import servicesReducer, {
   toggleServiceSelected,
   INITIAL_STATE,
 } from './serviceSlice'
-import services from '../../BEAUTY_SERVICES'
+import { DEFAULT_SERVICES } from '../../BEAUTY_SERVICES'
+import { RootState, ServiceId } from '../Types/Types'
 
-describe('Getting started with Redux', () => {
-  describe('services reducer', () => {
-    it('should return the default state', () => {
-      expect(servicesReducer(undefined, {})).toEqual(INITIAL_STATE)
+describe('Session reducer', () => {
+  describe('when a service is selected', () => {
+    it('should be added to the session', () => {
+      const initialState: ServiceId[] = []
+
+      const serviceClicked = '1'
+      expect(
+        servicesReducer(initialState, toggleServiceSelected(serviceClicked)),
+      ).toEqual([serviceClicked])
+    })
+
+    it('should be removed from the session', () => {
+      const serviceId = '1'
+      const initialState: ServiceId[] = [serviceId]
+
+      expect(
+        servicesReducer(initialState, toggleServiceSelected(serviceId)),
+      ).toEqual([])
     })
   })
 
   describe('Beauty Services', () => {
     describe('Microblading', () => {
       it('should not allow modifications', () => {
-        const microblading = Object.values(services).find(
+        const microblading = Object.values(DEFAULT_SERVICES).find(
           service => service.name === 'Microblading',
         )
 
@@ -25,12 +40,12 @@ describe('Getting started with Redux', () => {
 
     describe('Brow laminations', () => {
       it('Should allow configurations', () => {
-        const browLaminations = Object.values(services).find(
+        const browLamination = Object.values(DEFAULT_SERVICES).find(
           service => service.name === 'Brow lamination',
         )
 
-        expect(browLaminations.modifiable).toBeTruthy()
-        expect(browLaminations.options.length).toBeGreaterThan(1)
+        expect(browLamination.modifiable).toBeTruthy()
+        expect(browLamination.options.length).toBeGreaterThan(1)
       })
     })
   })

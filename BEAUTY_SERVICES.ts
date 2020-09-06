@@ -5,9 +5,9 @@ import {
 } from './src/Types/Types'
 // Clicking next goes to the next step for both sides
 
-const ORDERING = [1, 2, 3, 4, 5]
+export const DEFAULT_ORDERING = ['1', '2', '3', '4', '5']
 
-const ALL_SERVICES: ServiceCatalog = {
+export const DEFAULT_SERVICES: ServiceCatalog = {
   1: {
     id: '1',
     name: 'Microblading',
@@ -453,5 +453,3 @@ const ALL_SERVICES: ServiceCatalog = {
     ],
   },
 }
-
-export default ALL_SERVICES
