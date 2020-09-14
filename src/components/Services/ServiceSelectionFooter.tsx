@@ -1,5 +1,5 @@
 import React from "react";
-import { BeautyService } from "../../Types";
+import { BeautyService } from "../../Types/Types";
 
 import useBeautyServices from "./ServicesContext";
 import DynamicFontSizeBlackButtonFooter from "../DynamicFontBlackButtonFooter";
@@ -29,7 +29,7 @@ const ServiceSelectionFooter = ({ navigation }) => {
       onPress={() => {
         if (firstServiceToConfigure) {
           navigation.navigate("Options", {
-            name: firstServiceToConfigure.title
+            name: firstServiceToConfigure.title,
           });
         } else {
           navigation.navigate("ActiveServices");

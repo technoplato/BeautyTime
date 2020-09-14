@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { Headline } from "react-native-paper";
 import OptionListItem from "./OptionListItem";
 import useBeautyServices from "../Services/ServicesContext";
-import { Service, Option } from "../../Types";
+import { Service, Option } from "../../Types/Types";
 
 type Props = {
   service: Service;
@@ -21,7 +21,7 @@ const OptionList = ({ service }: Props) => {
         return (
           <OptionListItem
             key={option.title}
-            onToggle={selected =>
+            onToggle={(selected) =>
               selectOptionForService(option, service, selected)
             }
             option={option}
@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
     width: "100%",
 
     justifyContent: "center",
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 });
 
 export default OptionList;

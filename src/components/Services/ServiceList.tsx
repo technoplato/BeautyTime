@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import ServiceListItem from "./ServiceListItem";
 import useBeautyServices from "./ServicesContext";
-import { Service } from "../../Types";
+import { Service } from "../../Types/Types";
 
 const ServiceList = () => {
   const { services, selectService } = useBeautyServices();
@@ -12,7 +12,7 @@ const ServiceList = () => {
         return (
           <ServiceListItem
             key={service.title}
-            onToggle={selected => selectService(service, selected)}
+            onToggle={(selected) => selectService(service, selected)}
             service={service}
           />
         );
@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 });
 
 export default ServiceList;

@@ -2,7 +2,7 @@ import { default as React } from "react";
 import { TouchableWithoutFeedback, View } from "react-native";
 import { Title } from "react-native-paper";
 import HeartButton from "../../HeartButton";
-import { Service, Option } from "../../Types";
+import { Service, Option } from "../../Types/Types";
 
 interface Props {
   onToggle: (nowSelected: boolean) => void;
@@ -17,7 +17,7 @@ const OptionListItem = ({ onToggle, option }: Props) => {
           width: "100%",
           paddingHorizontal: 60,
           flexDirection: "row",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <HeartButton
