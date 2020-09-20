@@ -11,10 +11,7 @@ import {
   ServiceSelections,
   ServiceType,
 } from '../Types/Types'
-import {
-  CATALOG,
-  DEFAULT_ORDERING,
-} from '../../BEAUTY_SERVICES'
+import { CATALOG, DEFAULT_ORDERING } from '../../BEAUTY_SERVICES'
 
 export const INITIAL_STATE: RootState = {
   catalog: {
@@ -91,14 +88,26 @@ const sessionSlice = createSlice({
       if (service) {
         delete state[id]
       } else {
-        state[id] = {}
+        const service = CATALOG[id]
+        state[id] = service.modifiable ? null : service.options[0]
       }
+    },
+
+    selectOption(state, action) {
+      const {
+        payload: { serviceId, optionName },
+      } = action
+
+      state[serviceId] = CATALOG[serviceId].options.find(
+        option => option.name === optionName,
+      )
     },
   },
 })
 
 export const {
   toggleServiceSelected,
+  selectOption,
 } = sessionSlice.actions
 
 export default sessionSlice.reducer

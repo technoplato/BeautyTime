@@ -26,12 +26,14 @@ describe('Session reducer', () => {
             id,
           }),
         ),
-      ).toEqual({ [id]: {} })
+      ).toEqual({ [id]: CATALOG[id].options[0] })
     })
 
     it('should be removed from the session', () => {
       const id = '1'
-      const initialState: ServiceSelections = { [id]: {} }
+      const initialState: ServiceSelections = {
+        [id]: CATALOG[id].options[0],
+      }
 
       expect(
         servicesReducer(

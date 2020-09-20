@@ -48,6 +48,6 @@
     "quoteProps": "as-needed",
     "semi": false,
     "proseWrap": "always",
-    "printWidth": 60
+    "printWidth": 70
   }
 }

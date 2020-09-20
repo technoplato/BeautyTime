@@ -9,6 +9,8 @@ export type RootState = {
 }
 
 export type ServiceSelections = {
+  /* Value is null when service is selected but options
+   * haven't been chosen yet */
   [id: string]: BeautyServiceOption | null
 }
 
