@@ -37,7 +37,7 @@
     "babel-preset-expo": "~8.0.0",
     "jest": "^26.4.0",
     "prettier": "^2.0.5",
-    "typescript": "^3.8.3"
+    "typescript": "^4.0.3"
   },
   "private": true,
   "prettier": {
@@ -47,6 +47,7 @@
     "tabWidth": 2,
     "quoteProps": "as-needed",
     "semi": false,
-    "proseWrap": "always"
+    "proseWrap": "always",
+    "printWidth": 60
   }
 }

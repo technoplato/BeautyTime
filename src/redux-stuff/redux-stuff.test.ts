@@ -1,39 +1,106 @@
-import servicesReducer, { toggleServiceSelected } from './serviceSlice'
-import { DEFAULT_SERVICES } from '../../BEAUTY_SERVICES'
-import { RootState, ServiceId } from '../Types/Types'
+import servicesReducer, {
+  toggleServiceSelected,
+  selectNextButtonStatus,
+  INITIAL_STATE,
+  selectNextService,
+} from './serviceSlice'
+
+import { CATALOG, ServiceIds } from '../../BEAUTY_SERVICES'
+import {
+  BeautyService,
+  RootState,
+  ServiceId,
+  ServiceSelections,
+} from '../Types/Types'
 
 describe('Session reducer', () => {
   describe('when a service is selected', () => {
     it('should be added to the session', () => {
-      const initialState: ServiceId[] = []
+      const initialState: ServiceSelections = {}
 
-      const serviceClicked = '1'
+      const id = '1'
       expect(
-        servicesReducer(initialState, toggleServiceSelected(serviceClicked)),
-      ).toEqual([serviceClicked])
+        servicesReducer(
+          initialState,
+          toggleServiceSelected({
+            id,
+          }),
+        ),
+      ).toEqual({ [id]: {} })
     })
 
     it('should be removed from the session', () => {
-      const serviceId = '1'
-      const initialState: ServiceId[] = [serviceId]
+      const id = '1'
+      const initialState: ServiceSelections = { [id]: {} }
 
       expect(
-        servicesReducer(initialState, toggleServiceSelected(serviceId)),
-      ).toEqual([])
+        servicesReducer(
+          initialState,
+          toggleServiceSelected({ id }),
+        ),
+      ).toEqual({})
     })
   })
 
-  describe('The next button should update be disabled if no selections are made', () => {
-    const services = []
-    const nextButtonStatus = selectNextButtonStatus(services)
+  describe('Next Button', () => {
+    it('should be disabled and have the correct text with no services selected', () => {
+      const session = {}
+      const state: RootState = { ...INITIAL_STATE, session }
 
-    expect(nextButtonStatus).toEqual({ text: null, enabled: false })
+      const nextButtonStatus = selectNextButtonStatus(state)
+
+      expect(nextButtonStatus).toEqual({
+        text: 'Please Select at Least One Service',
+        enabled: false,
+      })
+    })
+
+    it('should say start session if only Micbroblading is selected', () => {
+      const session = {
+        [ServiceIds.MICROBLADING]: undefined,
+      }
+      const state: RootState = { ...INITIAL_STATE, session }
+
+      const nextButtonStatus = selectNextButtonStatus(state)
+
+      expect(nextButtonStatus).toEqual({
+        text: 'Start Session',
+        enabled: true,
+      })
+    })
+
+    it('should select the correct next service to configure', () => {
+      const session = {
+        [ServiceIds.MICROBLADING]: null,
+        [ServiceIds.LASH_EXTENSIONS]: null,
+      }
+      const state: RootState = { ...INITIAL_STATE, session }
+
+      const nextService = selectNextService(state)
+
+      expect(nextService).toEqual(
+        ServiceIds.LASH_EXTENSIONS,
+      )
+    })
+
+    it('selectNextServices should return undefined if no more services need selections', () => {
+      const session = {
+        [ServiceIds.MICROBLADING]: null,
+        [ServiceIds.LASH_EXTENSIONS]:
+          CATALOG[ServiceIds.LASH_EXTENSIONS].options[0],
+      }
+      const state: RootState = { ...INITIAL_STATE, session }
+
+      const nextService = selectNextService(state)
+
+      expect(nextService).toEqual(undefined)
+    })
   })
 
   describe('Beauty Services', () => {
     describe('Microblading', () => {
       it('should not allow modifications', () => {
-        const microblading = Object.values(DEFAULT_SERVICES).find(
+        const microblading = Object.values(CATALOG).find(
           service => service.name === 'Microblading',
         )
 
@@ -44,12 +111,14 @@ describe('Session reducer', () => {
 
     describe('Brow laminations', () => {
       it('Should allow configurations', () => {
-        const browLamination = Object.values(DEFAULT_SERVICES).find(
+        const browLamination = Object.values(CATALOG).find(
           service => service.name === 'Brow lamination',
         )
 
         expect(browLamination.modifiable).toBeTruthy()
-        expect(browLamination.options.length).toBeGreaterThan(1)
+        expect(
+          browLamination.options.length,
+        ).toBeGreaterThan(1)
       })
     })
   })

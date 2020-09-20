@@ -3,19 +3,31 @@ import {
   ServiceCatalog,
   ServiceType,
 } from './src/Types/Types'
-// Clicking next goes to the next step for both sides
 
-export const DEFAULT_ORDERING = ['1', '2', '3', '4', '5']
+export const ServiceIds = {
+  MICROBLADING: '1',
+  BROW_LAMINATION: '2',
+  LASH_LIFT_AND_TINT: '3',
+  LASH_EXTENSIONS: '4',
+  FACIAL: '5',
+}
 
-export const DEFAULT_SERVICES: ServiceCatalog = {
-  1: {
-    id: '1',
+export const DEFAULT_ORDERING = [
+  ServiceIds.MICROBLADING,
+  ServiceIds.BROW_LAMINATION,
+  ServiceIds.LASH_LIFT_AND_TINT,
+  ServiceIds.LASH_EXTENSIONS,
+  ServiceIds.FACIAL,
+]
+
+export const CATALOG: ServiceCatalog = {
+  [ServiceIds.MICROBLADING]: {
+    id: ServiceIds.MICROBLADING,
     name: 'Microblading',
     type: ServiceType.BROWS,
 
     options: [
       {
-        name: 'default',
         steps: [
           {
             description: 'Ink Soak',
@@ -38,8 +50,8 @@ export const DEFAULT_SERVICES: ServiceCatalog = {
     ],
   },
 
-  2: {
-    id: '2',
+  [ServiceIds.BROW_LAMINATION]: {
+    id: ServiceIds.MICROBLADING,
     name: 'Brow lamination',
     type: ServiceType.BROWS,
     modifiable: true,
@@ -160,122 +172,11 @@ export const DEFAULT_SERVICES: ServiceCatalog = {
     ],
   },
 
-  3: {
-    id: '3',
-    name: 'Brow lamination',
-    type: ServiceType.BROWS,
-
-    options: [
-      {
-        name: 'Very fine brows',
-        steps: [
-          {
-            description: 'Apply Bonder',
-            completesBy: CompletionOption.CLICK,
-          },
-          {
-            description: 'Apply Packet #1',
-            duration: 240,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Packet #2',
-            duration: 300,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Tint & Wax Brows',
-            duration: 180,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Packet #3',
-            completesBy: CompletionOption.CLICK,
-          },
-        ],
-      },
-      {
-        name: 'Fine or tinted brows',
-        steps: [
-          { description: 'Apply Bonder', completesBy: CompletionOption.CLICK },
-          {
-            description: 'Apply Packet #1',
-            duration: 300,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Packet #2',
-            duration: 300,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Tint & Wax Brows',
-            duration: 180,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Packet #3',
-            completesBy: CompletionOption.CLICK,
-          },
-        ],
-      },
-      {
-        name: 'Natural healthy brows',
-        steps: [
-          { description: 'Apply Bonder', completesBy: CompletionOption.CLICK },
-          {
-            description: 'Apply Packet #1',
-            duration: 360,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Packet #2',
-            duration: 360,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Tint & Wax Brows',
-            duration: 180,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Packet #3',
-            completesBy: CompletionOption.CLICK,
-          },
-        ],
-      },
-      {
-        name: 'Coarse healthy brows',
-        steps: [
-          { description: 'Apply Bonder', completesBy: CompletionOption.CLICK },
-          {
-            description: 'Apply Packet #1',
-            duration: 420,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Packet #2',
-            duration: 360,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Tint & Wax Brows',
-            duration: 180,
-            completesBy: CompletionOption.ANY,
-          },
-          {
-            description: 'Apply Packet #3',
-            completesBy: CompletionOption.CLICK,
-          },
-        ],
-      },
-    ],
-  },
-
-  4: {
-    id: '4',
+  [ServiceIds.LASH_LIFT_AND_TINT]: {
+    id: ServiceIds.LASH_LIFT_AND_TINT,
     type: ServiceType.LASHES,
     name: 'Lash lift + tint',
+    modifiable: true,
     options: [
       {
         name: 'Very fine lashes',
@@ -284,7 +185,10 @@ export const DEFAULT_SERVICES: ServiceCatalog = {
             description: 'Apply Undereye Pads',
             completesBy: CompletionOption.CLICK,
           },
-          { description: 'Apply Bonder', completesBy: CompletionOption.CLICK },
+          {
+            description: 'Apply Bonder',
+            completesBy: CompletionOption.CLICK,
+          },
           {
             description: 'Apply Packet #1',
             duration: 300,
@@ -313,7 +217,10 @@ export const DEFAULT_SERVICES: ServiceCatalog = {
             description: 'Apply Undereye Pads',
             completesBy: CompletionOption.CLICK,
           },
-          { description: 'Apply Bonder', completesBy: CompletionOption.CLICK },
+          {
+            description: 'Apply Bonder',
+            completesBy: CompletionOption.CLICK,
+          },
           {
             description: 'Apply Packet #1',
             duration: 360,
@@ -342,7 +249,10 @@ export const DEFAULT_SERVICES: ServiceCatalog = {
             description: 'Apply Undereye Pads',
             completesBy: CompletionOption.CLICK,
           },
-          { description: 'Apply Bonder', completesBy: CompletionOption.CLICK },
+          {
+            description: 'Apply Bonder',
+            completesBy: CompletionOption.CLICK,
+          },
           {
             description: 'Apply Packet #1',
             duration: 480,
@@ -371,7 +281,10 @@ export const DEFAULT_SERVICES: ServiceCatalog = {
             description: 'Apply Undereye Pads',
             completesBy: CompletionOption.CLICK,
           },
-          { description: 'Apply Bonder', completesBy: CompletionOption.CLICK },
+          {
+            description: 'Apply Bonder',
+            completesBy: CompletionOption.CLICK,
+          },
           {
             description: 'Apply Packet #1',
             duration: 600,
@@ -396,10 +309,11 @@ export const DEFAULT_SERVICES: ServiceCatalog = {
     ],
   },
 
-  5: {
-    id: '5',
+  [ServiceIds.LASH_EXTENSIONS]: {
+    id: ServiceIds.LASH_EXTENSIONS,
     name: 'Lash extensions',
     type: ServiceType.LASHES,
+    modifiable: true,
     options: [
       {
         name: 'Lash extensions - Replace Glue',
@@ -415,13 +329,13 @@ export const DEFAULT_SERVICES: ServiceCatalog = {
     ],
   },
 
-  6: {
-    id: '6',
+  [ServiceIds.FACIAL]: {
+    id: ServiceIds.FACIAL,
     type: ServiceType.FACIAL,
     name: 'Facial',
+    modifiable: false,
     options: [
       {
-        name: 'Mask',
         steps: [
           {
             description: 'Mask',
@@ -431,7 +345,6 @@ export const DEFAULT_SERVICES: ServiceCatalog = {
         ],
       },
       {
-        name: 'LED Light',
         steps: [
           {
             description: 'LED Light',
@@ -441,11 +354,10 @@ export const DEFAULT_SERVICES: ServiceCatalog = {
         ],
       },
       {
-        name: 'Complete Session',
         steps: [
           {
-            description: 'Complete Session',
-            duration: 3600,
+            description: 'Arm rub',
+            duration: 600,
             completesBy: CompletionOption.ANY,
           },
         ],

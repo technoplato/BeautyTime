@@ -1,8 +1,15 @@
 export type ServiceId = string
 
 export type RootState = {
-  catalog: { services: ServiceCatalog; ordering: ServiceId[] }
-  session: ServiceId[]
+  catalog: {
+    services: ServiceCatalog
+    ordering: ServiceId[]
+  }
+  session: ServiceSelections
+}
+
+export type ServiceSelections = {
+  [id: string]: BeautyServiceOption | null
 }
 
 export type ServiceCatalog = {
@@ -19,7 +26,7 @@ export type BeautyService = {
 }
 
 export type BeautyServiceOption = {
-  name: string
+  name?: string
   steps: ServiceStep[]
 }
 
