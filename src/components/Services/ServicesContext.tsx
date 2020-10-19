@@ -35,14 +35,12 @@ type ServicesContextProps =
     }
   | undefined
 
-export const ServiceContext = createContext<
-  ServicesContextProps
->(undefined)
+export const ServiceContext = createContext<ServicesContextProps>(
+  undefined,
+)
 
 const configureServiceContext = (): ServicesContextProps => {
-  const [services, updateServices] = useImmer<Service[]>(
-    servicesJSON,
-  )
+  const [services, updateServices] = useImmer<Service[]>(servicesJSON)
   const [
     firstServiceToConfigure,
     setFirstServiceToConfigure,
@@ -74,9 +72,7 @@ const configureServiceContext = (): ServicesContextProps => {
 
     for (let i = start; i < selectedServices.length; i++) {
       const s = selectedServices[i]
-      if (
-        s?.options.filter(o => !o.isDefault).length >= 1
-      ) {
+      if (s?.options.filter(o => !o.isDefault).length >= 1) {
         next = s
         break
       }
@@ -154,9 +150,7 @@ const configureServiceContext = (): ServicesContextProps => {
       const stepCompleted =
         stepCompletion['both'] ||
         (stepCompletion['left'] && stepCompletion['right'])
-      const serviceCompleted = option.steps.every(
-        s => s.completed,
-      )
+      const serviceCompleted = option.steps.every(s => s.completed)
 
       step.completed = stepCompleted
       options[optionIndex].steps[stepIndex] = step
@@ -188,26 +182,23 @@ const configureServiceContext = (): ServicesContextProps => {
     })
 
   return {
-    selectService,
-    services,
-    selectedServices,
-    getNextSelectedServiceWithOptions,
-    selectOptionForService,
-    findServiceByName,
-    firstServiceToConfigure,
-    markStepComplete,
-    sessionComplete,
-    reset,
+    selectService: service => {},
+    services: [],
+    selectedServices: [],
+    getNextSelectedServiceWithOptions: current => current,
+    selectOptionForService: options => {},
+    findServiceByName: string => {},
+    firstServiceToConfigure: () => {},
+    markStepComplete: serviceIndex => {},
+    sessionComplete: false,
+    reset: () => {},
   }
 }
 
 export const ServiceProvider = props => (
-  <ServiceContext.Provider
-    value={configureServiceContext()}
-  >
+  <ServiceContext.Provider value={configureServiceContext()}>
     {props.children}
   </ServiceContext.Provider>
 )
 
-export default () =>
-  useContext<ServicesContextProps>(ServiceContext)
+export default () => useContext<ServicesContextProps>(ServiceContext)

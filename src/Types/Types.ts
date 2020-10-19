@@ -1,21 +1,26 @@
 export type ServiceId = string
 
-export type RootState = {
-  catalog: {
-    services: ServiceCatalog
-    ordering: ServiceId[]
-  }
-  session: ServiceSelections
-}
+// export type RootState = {
+//   all: ServiceCatalog
+//   selected: SelectedServices
+//   ordering: ServiceId[]
+// }
 
-export type ServiceSelections = {
-  /* Value is null when service is selected but options
-   * haven't been chosen yet */
-  [id: string]: BeautyServiceOption | null
+export type SelectedServices = {
+  [id: string]: BeautyService
 }
 
 export type ServiceCatalog = {
-  [id: string]: BeautyService
+  [id: string]: BeautyCatalogItem
+}
+
+export type BeautyCatalogItem = {
+  id: string
+  name: string
+  type: ServiceType
+  modifiable?: boolean
+  options: BeautyServiceOption[]
+  setupInstructions?: SetupInstruction[]
 }
 
 export type BeautyService = {
@@ -23,7 +28,8 @@ export type BeautyService = {
   name: string
   type: ServiceType
   modifiable?: boolean
-  options: BeautyServiceOption[]
+  option: BeautyServiceOption
+  optionApproved: boolean
   setupInstructions?: SetupInstruction[]
 }
 

@@ -1,5 +1,6 @@
 {
   "expo": {
+    "entryPoint": "./App.tsx",
     "name": "Beauty Time",
     "slug": "BeautyTime",
     "privacy": "public",

@@ -1,72 +1,26 @@
-import * as React from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import React from 'react'
+import { configureStore } from '@reduxjs/toolkit'
 
-import useCustomFonts from "./src/Fonts/useCustomFonts";
-import { ServiceProvider } from "./src/components/Services/ServicesContext";
-import { createStackNavigator } from "@react-navigation/stack";
-import { useKeepAwake } from "expo-keep-awake";
+import { Provider } from 'react-redux'
 
-import { Image, View } from "react-native";
-import { Provider as PaperProvider } from "react-native-paper";
-import ApplicationStyles from "./src/Themes/ApplicationStyles";
+import Navigation from './Navigation'
+import reducer from './src/redux/reducers'
 
-import ServiceSelectionScreen from "./src/screens/ServiceSelectionScreen";
-import OptionsSelectionScreen from "./src/screens/OptionsSelectionScreen";
-import ActiveServicesScreen from "./src/screens/ActiveServicesScreen";
-import SessionCompleteScreen from "./src/screens/SessionCompleteScreen";
+const store = configureStore({
+  reducer,
+})
 
-const Stack = createStackNavigator();
+import { registerRootComponent } from 'expo'
 
-const App = () => {
-  const { loading } = useCustomFonts();
-  useKeepAwake();
+class App extends React.Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <Navigation />
+      </Provider>
+    )
+  }
+}
 
-  if (loading) return null;
-  return (
-    <NavigationContainer>
-      <PaperProvider theme={ApplicationStyles.theme}>
-        <ServiceProvider>
-          <Stack.Navigator
-            screenOptions={{
-              header: () => (
-                <View
-                  style={{
-                    height: 120,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    flexDirection: "row",
-                    marginTop: 30,
-                    padding: 12,
-                  }}
-                >
-                  <Image
-                    style={{
-                      flex: 1,
-                      height: 120,
-                      margin: 24,
-                    }}
-                    source={require("../BeautyTime/assets/bb_logo.png")}
-                    resizeMode="contain"
-                  />
-                </View>
-              ),
-            }}
-          >
-            <Stack.Screen name="Services" component={ServiceSelectionScreen} />
-            <Stack.Screen name="Options" component={OptionsSelectionScreen} />
-            <Stack.Screen
-              name="ActiveServices"
-              component={ActiveServicesScreen}
-            />
-            <Stack.Screen
-              name="SessionComplete"
-              component={SessionCompleteScreen}
-            />
-          </Stack.Navigator>
-        </ServiceProvider>
-      </PaperProvider>
-    </NavigationContainer>
-  );
-};
-
-export default App;
+// @ts-ignore
+export default registerRootComponent(App)

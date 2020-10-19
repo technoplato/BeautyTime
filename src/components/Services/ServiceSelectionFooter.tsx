@@ -1,43 +1,24 @@
-import React from "react";
-import { BeautyService } from "../../Types/Types";
+import React from 'react'
+import { BeautyCatalogItem } from '../../Types/Types'
 
-import useBeautyServices from "./ServicesContext";
-import DynamicFontSizeBlackButtonFooter from "../DynamicFontBlackButtonFooter";
-
-const serviceSelectionButtonText = (
-  first: BeautyService,
-  selected: BeautyService[]
-): string => {
-  if (selected.length === 0) {
-    return "Please Select at Least One Service";
-  } else if (first === undefined) {
-    return "Start Session";
-  } else {
-    return "NEXT: Select Options for Services";
-  }
-};
+import DynamicFontSizeBlackButtonFooter from '../DynamicFontBlackButtonFooter'
 
 const ServiceSelectionFooter = ({ navigation }) => {
-  const { firstServiceToConfigure, selectedServices } = useBeautyServices();
-
   return (
     <DynamicFontSizeBlackButtonFooter
-      title={serviceSelectionButtonText(
-        firstServiceToConfigure,
-        selectedServices
-      )}
+      title={'Title'}
       onPress={() => {
-        if (firstServiceToConfigure) {
-          navigation.navigate("Options", {
-            name: firstServiceToConfigure.title,
-          });
-        } else {
-          navigation.navigate("ActiveServices");
-        }
+        // if (firstServiceToConfigure) {
+        //   navigation.navigate('Options', {
+        //     name: firstServiceToConfigure.title,
+        //   })
+        // } else {
+        //   navigation.navigate('ActiveServices')
+        // }
       }}
-      disabled={selectedServices.length === 0}
+      disabled={false}
     />
-  );
-};
+  )
+}
 
-export default ServiceSelectionFooter;
+export default ServiceSelectionFooter
