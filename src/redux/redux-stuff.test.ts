@@ -18,9 +18,32 @@ import {
 } from '../Types/Types'
 import { RootState } from './reducers'
 
+function makeStateWithSelections(
+  ids: ServiceId[],
+  mockApproveAction = false,
+) {
+  const selected: SelectedServices = ids
+    .map(id => selectCatalog(INITIAL_STATE)[id])
+    .map(mapCatalogToServiceItem)
+    .reduce((selected, service) => {
+      selected[service.id] = {
+        ...service,
+        optionApproved: mockApproveAction || !service.modifiable,
+      }
+
+      return selected
+    }, {})
+  const state: RootState = produce(INITIAL_STATE, draft => {
+    draft.services.selected = selected
+  })
+  return state
+}
+
 export const INITIAL_STATE = { services: INITIAL_SERVICE_STATE }
 
 describe('Service reducer', () => {
+  describe('when an option is selected', () => {})
+
   describe('when a service is selected', () => {
     it('should be added to the session', () => {
       const id: ServiceId = ServiceIds.MICROBLADING
@@ -34,17 +57,10 @@ describe('Service reducer', () => {
     })
 
     it('should be removed from the session', () => {
-      const id: ServiceId = ServiceIds.MICROBLADING
-      const microblading = selectCatalog(INITIAL_STATE)[id]
-
-      const stateWithMicroblading = produce(
-        INITIAL_SERVICE_STATE,
-        draft => {
-          draft.selected[id] = mapCatalogToServiceItem(microblading)
-        },
-      )
+      const id = ServiceIds.MICROBLADING
+      const stateWithMicroblading = makeStateWithSelections([id])
       const actual: ServicesState = servicesReducer(
-        stateWithMicroblading,
+        stateWithMicroblading.services,
         toggleService({
           id,
         }),
@@ -64,13 +80,9 @@ describe('Service reducer', () => {
     })
 
     it('should say start session if only Micbroblading is selected', () => {
-      const id: ServiceId = ServiceIds.MICROBLADING
-      const microblading = selectCatalog(INITIAL_STATE)[id]
-      const stateWithMicroblading = produce(INITIAL_STATE, draft => {
-        draft.services.selected[id] = mapCatalogToServiceItem(
-          microblading,
-        )
-      })
+      const stateWithMicroblading = makeStateWithSelections([
+        ServiceIds.MICROBLADING,
+      ])
       const nextButtonStatus = selectNextButtonStatus(
         stateWithMicroblading,
       )
@@ -80,27 +92,6 @@ describe('Service reducer', () => {
         enabled: true,
       })
     })
-
-    function makeStateWithSelections(
-      ids: ServiceId[],
-      mockApproveAction = false,
-    ) {
-      const selected: SelectedServices = ids
-        .map(id => selectCatalog(INITIAL_STATE)[id])
-        .map(mapCatalogToServiceItem)
-        .reduce((selected, service) => {
-          selected[service.id] = {
-            ...service,
-            optionApproved: mockApproveAction,
-          }
-
-          return selected
-        }, {})
-      const state: RootState = produce(INITIAL_STATE, draft => {
-        draft.services.selected = selected
-      })
-      return state
-    }
 
     it('should select the correct next service to configure', () => {
       const stateWithSelections = makeStateWithSelections([
